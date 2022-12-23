@@ -4,6 +4,7 @@ import common.bankarskiSistem.model.*;
 import common.bankarskiSistem.repository.BankAccountRepository;
 import common.bankarskiSistem.repository.UserRepository;
 import common.bankarskiSistem.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.control.MappingControl;
 import org.mockito.Mockito;
@@ -14,6 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class UserServiceUnitTests {
@@ -40,6 +43,36 @@ class UserServiceUnitTests {
 		User found = userService.getUserByPersonalID(personalId);
 
 		assertThat(found.getPersonalId()).isEqualTo(personalId);
+	}
+
+	@Test
+	public void whenNonValidPersonalId_thenNullPointerExceptionIsThrown() {
+
+		Exception exception = assertThrows(NullPointerException.class, () ->{
+			userService.getUserByPersonalID(null);
+		});
+
+		String expectedMessage = "Null personal id";
+		String actualMessage = exception.getMessage();
+
+		assertEquals(expectedMessage,actualMessage);
+	}
+
+	@Test
+	public void whenNonExistingPersonalId_thenUserShouldNotBeFound() {
+		String personalId = "2011445745511";
+
+		Mockito.when(userRepository.findByPersonalId(personalId)).thenReturn(Optional.empty());
+
+
+		Exception exception = assertThrows(NullPointerException.class, () ->{
+			userService.getUserByPersonalID(personalId);
+		});
+
+		String expectedMessage = "User [" + personalId + "]" + " not found";
+		String actualMessage = exception.getMessage();
+
+		assertEquals(expectedMessage,actualMessage);
 	}
 
 	@Test
@@ -71,6 +104,31 @@ class UserServiceUnitTests {
 		BankAccount found = userService.getBankAccountByID(personalId,account_id);
 
 		assertThat(found.getIdAccount()).isEqualTo(account_id);
+	}
+
+	@Test
+	public void whenNonValidBankAccountId_thenNullShouldBeFound() {
+		String personalId = "2011445745511";
+		String user_name = "Pera";
+		String user_surname = "Petrovic";
+		String user_address = "Adr 1";
+
+		User user = new User(personalId, user_name, user_surname, user_address);
+
+		Integer id_bank = 1;
+		String bank_address = "Mihaila Pupina 13";
+		String bank_name = "Banka Intesa";
+
+		Bank bank = new Bank(id_bank, bank_name, bank_address);
+
+		Integer account_id = 1;
+
+		Mockito.when(bankAccountRepository.findById(account_id)).thenReturn(Optional.empty());
+		Mockito.when(userRepository.findByPersonalId(personalId)).thenReturn(Optional.of(user));
+
+		BankAccount found = userService.getBankAccountByID(personalId,account_id);
+
+		assertThat(found).isNull();
 	}
 
 	@Test
