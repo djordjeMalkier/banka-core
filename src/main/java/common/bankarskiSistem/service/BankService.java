@@ -15,12 +15,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-
 public class BankService {
     @Autowired
     private BankRepository bankRepository;
     @Autowired
     private ExchangeRatesRepository exchangeRatesRepository;
+
+    public BankService(BankRepository bankRepository, ExchangeRatesRepository exchangeRatesRepository) {
+        this.bankRepository = bankRepository;
+        this.exchangeRatesRepository = exchangeRatesRepository;
+    }
 
 
     /**
