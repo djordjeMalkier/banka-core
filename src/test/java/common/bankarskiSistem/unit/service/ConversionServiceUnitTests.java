@@ -7,10 +7,10 @@ import common.bankarskiSistem.model.ExchangeRates;
 import common.bankarskiSistem.repository.ConversionRepository;
 import common.bankarskiSistem.service.ConversionService;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +22,9 @@ import static org.mockito.Mockito.times;
 
 @SpringBootTest
 public class ConversionServiceUnitTests {
-    @Autowired
+    @InjectMocks
     private ConversionService conversionService;
-    @MockBean
+    @Mock
     private ConversionRepository conversionRepository;
 
 
