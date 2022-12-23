@@ -6,10 +6,12 @@ import common.bankarskiSistem.model.ExchangeRates;
 import common.bankarskiSistem.repository.BankRepository;
 import common.bankarskiSistem.repository.ExchangeRatesRepository;
 import common.bankarskiSistem.service.BankService;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,8 +20,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BankServiceTest {
@@ -27,42 +31,31 @@ class BankServiceTest {
     private BankRepository bankRepository;
     @Mock
     private ExchangeRatesRepository exchangeRatesRepository;
+    @InjectMocks
     private BankService bankService;
 
-    @BeforeEach
-    void setUp() {
-        bankService = new BankService(bankRepository, exchangeRatesRepository);
-    }
-
-    @Test
-    void canCreateBank() throws NameOfTheBankAlreadyExistException {
-        //given
-        String name = "Intesa";
-        String address = "Vojvode Vlahovica 1";
-
-        Bank bank = new Bank();
-        bank.setName(name);
-        bank.setAddress(address);
-
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#createBank_params")
+    void canCreateBank(Bank bank, Bank saved) throws NameOfTheBankAlreadyExistException {
         //when
-        bankService.createBank(bank);
+        when(bankRepository.save(any(Bank.class)))
+                .thenReturn(saved);
+
+        Bank actual = bankService.createBank(bank);
 
         //then
-        ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
-        verify(bankRepository).save(bankArgumentCaptor.capture());
+//        ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
+//        verify(bankRepository).save(bankArgumentCaptor.capture());
+//
+//        Bank capturedBank = bankArgumentCaptor.getValue();
 
-        Bank capturedBank = bankArgumentCaptor.getValue();
-
-        assertThat(capturedBank).isEqualTo(bank);
+        verify(bankRepository, times(1)).findByName(anyString());
+        assertThat(actual).isEqualTo(saved);
     }
 
-    @Test
-    void whenNameAlreadyExists_ThenCreateBankThrowsNameOfTheBankAlreadyExistException() {
-        //given
-        String name = "Intesa";
-        Bank bank = new Bank();
-        bank.setName(name);
-
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#createBank_params")
+    void whenNameAlreadyExists_ThenCreateBankThrowsNameOfTheBankAlreadyExistException(Bank bank) {
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
 
         //when and then
@@ -75,23 +68,13 @@ class BankServiceTest {
     @Test
     void whenBankIsNull_ThenCreateBankThrowsNullPointerException() {
         assertThatThrownBy(() -> bankService.createBank(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("The bank is null.");
+                .isInstanceOf(NullPointerException.class);
     }
 
-    @Test
-    void canDeleteBank() {
-        //given
-        String name = "Intesa";
-        String address = "Vojvode Vlahovica 1";
-        Integer idBank = 5;
-
-        Bank bank = new Bank();
-        bank.setIdBank(idBank);
-        bank.setName(name);
-        bank.setAddress(address);
-
-        Mockito.when(bankRepository.findByIdBank(idBank)).thenReturn(Optional.of(bank));
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#deleteBank_params")
+    void canDeleteBank(Bank bank) {
+        Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         Mockito.when(bankRepository.deleteByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
 
         //when
@@ -101,40 +84,31 @@ class BankServiceTest {
         assertThat(result.getIdBank()).isEqualTo(bank.getIdBank());
     }
 
-    @Test
-    void whenBankDoesNotExists_ThenDeleteBankThrowsNullPointerException() {
-        //given
-        Bank bank = new Bank();
-
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    void whenBankDoesNotExists_ThenDeleteBankThrowsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
         assertThatThrownBy(() -> bankService.deleteBank(bank))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("The bank does not exist.");
+                .isInstanceOf(NullPointerException.class);
     }
 
-    @Test
-    void canFindBankById() {
-        //given
-        Integer idBank = 1;
-        Bank bank = new Bank();
-        bank.setIdBank(idBank);
-
-        Mockito.when(bankRepository.findByIdBank(idBank)).thenReturn(Optional.of(bank));
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#findById_params")
+    void canFindBankById(Bank bank) {
+        Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
 
         //when
-        Bank result = bankService.findById(idBank);
+        Bank result = bankService.findById(bank.getIdBank());
 
         //then
         assertThat(result.getIdBank()).isEqualTo(bank.getIdBank());
     }
 
-    @Test
-    void whenBankDoesNotExists_ThenFindByIdThrowsNullPointerException() {
-        //given
-        Bank bank = new Bank();
-
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    void whenBankDoesNotExists_ThenFindByIdThrowsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
@@ -143,22 +117,10 @@ class BankServiceTest {
                 .hasMessageContaining("The bank does not exist.");
     }
 
-    @Test
-    void updateBankName() throws NameOfTheBankAlreadyExistException {
-        //given
-        Integer idBank = 1;
-
-        Bank bankOld = new Bank();
-        bankOld.setIdBank(idBank);
-        String nameOld = "Erste";
-        bankOld.setName(nameOld);
-
-        Bank bankNew = new Bank();
-        bankNew.setIdBank(idBank);
-        String nameNew = "Intesa";
-        bankNew.setName(nameNew);
-
-        Mockito.when(bankRepository.findByIdBank(idBank)).thenReturn(Optional.of(bankOld));
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#updateBank_params")
+    void updateBankName(Bank bankOld, Bank bankNew) throws NameOfTheBankAlreadyExistException {
+        Mockito.when(bankRepository.findByIdBank(bankOld.getIdBank())).thenReturn(Optional.of(bankOld));
         Mockito.when(bankRepository.save(bankOld)).thenReturn(bankNew);
         //when
         Bank updateBank = bankService.updateBank(bankOld);
@@ -167,22 +129,10 @@ class BankServiceTest {
         assertThat(updateBank.getName()).isEqualTo(bankNew.getName());
     }
 
-    @Test
-    void updateBankAddress() throws NameOfTheBankAlreadyExistException {
-        //given
-        Integer idBank = 1;
-
-        Bank bankOld = new Bank();
-        bankOld.setIdBank(idBank);
-        String addressOld = "Vojvode Vlahovica 1";
-        bankOld.setAddress(addressOld);
-
-        Bank bankNew = new Bank();
-        bankNew.setIdBank(idBank);
-        String addressNew = "Stepe Stepanovica 2";
-        bankNew.setAddress(addressNew);
-
-        Mockito.when(bankRepository.findByIdBank(idBank)).thenReturn(Optional.of(bankOld));
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#updateBank_params")
+    void updateBankAddress(Bank bankOld, Bank bankNew) throws NameOfTheBankAlreadyExistException {
+        Mockito.when(bankRepository.findByIdBank(bankOld.getIdBank())).thenReturn(Optional.of(bankOld));
         Mockito.when(bankRepository.save(bankOld)).thenReturn(bankNew);
         //when
         Bank updateBank = bankService.updateBank(bankOld);
@@ -191,11 +141,9 @@ class BankServiceTest {
         assertThat(updateBank.getAddress()).isEqualTo(bankNew.getAddress());
     }
 
-    @Test
-    void whenBankDoesNotExists_ThenUpdateBankThrowsNullPointerException() {
-        //given
-        Bank bank = new Bank();
-
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    void whenBankDoesNotExists_ThenUpdateBankThrowsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
@@ -204,11 +152,9 @@ class BankServiceTest {
                 .hasMessageContaining("The bank does not exist.");
     }
 
-    @Test
-    void whenNameAlreadyExists_ThenUpdateBankThrowsNameOfTheBankAlreadyExistException() {
-        //given
-        Bank bank = new Bank();
-
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    void whenNameAlreadyExists_ThenUpdateBankThrowsNameOfTheBankAlreadyExistException(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
 
@@ -218,29 +164,14 @@ class BankServiceTest {
                 .hasMessageContaining("Name already exist.");
     }
 
-    @Test
-    void addExchangeRates() {
-        //given
-        Integer idExchangeRates = 1;
-        String name = "Kurs 1";
-
-        ExchangeRates exchangeRates = new ExchangeRates();
-        exchangeRates.setIdExchangeRates(idExchangeRates);
-        exchangeRates.setName(name);
-
-        Integer idBank = 1;
-        String nameBank = "Intesa";
-        String address = "Vojvode Vlahovica 1";
-        Bank bank = new Bank();
-        bank.setIdBank(idBank);
-        bank.setName(nameBank);
-        bank.setAddress(address);
-
-        Mockito.when(bankRepository.findByIdBank(idBank)).thenReturn(Optional.of(bank));
-        Mockito.when(exchangeRatesRepository.findByIdExchangeRates(idExchangeRates)).thenReturn(Optional.of(exchangeRates));
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#addExchangeRates_params")
+    void addExchangeRates(Bank bank, ExchangeRates exchangeRates) {
+        Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
+        Mockito.when(exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates())).thenReturn(Optional.of(exchangeRates));
 
         //when
-        Bank newBank = bankService.addExchangeRates(idExchangeRates, bank);
+        bankService.addExchangeRates(exchangeRates.getIdExchangeRates(), bank);
 
         //then
         ArgumentCaptor<Bank> bankRatesArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
@@ -251,12 +182,9 @@ class BankServiceTest {
         assertThat(capturedBank).isEqualTo(bank);
     }
 
-    @Test
-    void whenBankDoesNotExists_ThenAddExchangeRatesThrowsNullPointerException() {
-        //given
-        Bank bank = new Bank();
-        Integer idExchangeRates = 1;
-
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bankObjectAndIdExchangeRates_param")
+    void whenBankDoesNotExists_ThenAddExchangeRatesThrowsNullPointerException(Bank bank, Integer idExchangeRates) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
