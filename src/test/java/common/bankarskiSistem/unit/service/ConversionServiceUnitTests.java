@@ -6,47 +6,82 @@ import common.bankarskiSistem.model.Currency;
 import common.bankarskiSistem.model.ExchangeRates;
 import common.bankarskiSistem.repository.ConversionRepository;
 import common.bankarskiSistem.service.ConversionService;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class ConversionServiceUnitTests {
     @InjectMocks
     private ConversionService conversionService;
     @Mock
     private ConversionRepository conversionRepository;
 
-
-    @Test
-    public void whenValidId_thenConversionShouldBeFound() {
-        //Given
-        Integer idConversion = 5;
-        Conversion conversion = new Conversion();
-        conversion.setIdConversion(idConversion);
-        Mockito.when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.of(conversion));
-
-        //When
-        Conversion found = conversionService.findByIdConversion(idConversion);
-
-        //Then
-        assertThat(found.getIdConversion()).isEqualTo(idConversion);
+    private static Conversion generateOneConversion() {
+        return new Conversion(
+                5,
+                Currency.EUR,
+                Currency.RSD,
+                0.75,
+                null);
     }
 
-    @Test
-    public void whenInvalidId_thenThrowNullPointerException() {
+    private static Stream<Arguments> generateConversion(){
+        return Stream.of(Arguments.of(
+                generateOneConversion()));
+    }
+
+    private static Stream<Arguments> generateBank(){
+        return Stream.of(Arguments.of(
+                new Bank(
+                        1,
+                        "Bank Intesa",
+                        "Milutina Milankovica 1",
+                        null,
+                        new ExchangeRates(
+                                1,
+                                "kurs 1",
+                                new ArrayList<>(List.of(generateOneConversion())),
+                                null
+                                )
+                        )));
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("generateConversion")
+    public void whenValidId_thenConversionShouldBeFound(Conversion conversion) {
         //Given
-        Integer nonValidIdConversion = 1;
+        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+                .thenReturn(Optional.of(conversion));
+
+        //When
+        Conversion found = conversionService.findByIdConversion(conversion.getIdConversion());
+
+        //Then
+        assertThat(found.getIdConversion()).isEqualTo(conversion.getIdConversion());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 5})
+    public void whenInvalidId_thenThrowNullPointerException(Integer nonValidIdConversion) {
+        //Given
         Mockito.when(conversionRepository.findByIdConversion(nonValidIdConversion)).thenReturn(Optional.empty());
 
         //When
@@ -59,11 +94,12 @@ public class ConversionServiceUnitTests {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
-    @Test
-    public void whenConversionIsNull_thenDeleteConversionThrowsNullPointerException() {
+    @ParameterizedTest
+    @NullSource
+    public void whenConversionIsNull_thenDeleteConversionThrowsNullPointerException(Conversion conversion) {
         //When
         Exception exception = assertThrows(NullPointerException.class,
-                () -> conversionService.deleteConversion(null));
+                () -> conversionService.deleteConversion(conversion));
 
         //Then
         String expectedMessage = "Conversion does not exist";
@@ -71,14 +107,9 @@ public class ConversionServiceUnitTests {
         assertEquals(actualMessage, expectedMessage);
     }
 
-    @Test
-    public void whenValidId_thenConversionShouldBeDeleted() {
-        //Given
-        Integer idConversion = 5;
-        Conversion conversion = new Conversion();
-        conversion.setIdConversion(idConversion);
-        Mockito.when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.of(conversion));
-
+    @ParameterizedTest
+    @MethodSource("generateConversion")
+    public void whenValidId_thenConversionShouldBeDeleted(Conversion conversion) {
         //When
         Conversion result = conversionService.deleteConversion(conversion);
 
@@ -88,11 +119,12 @@ public class ConversionServiceUnitTests {
         assertThat(result.getIdConversion()).isEqualTo(conversion.getIdConversion());
     }
 
-    @Test
-    public void whenConversionIsNull_thenAddConversionThrowsNullPointerException() {
+    @ParameterizedTest
+    @NullSource
+    public void whenConversionIsNull_thenAddConversionThrowsNullPointerException(Conversion conversion) {
         //When
         Exception exception = assertThrows(NullPointerException.class,
-                () -> conversionService.addConversion(null));
+                () -> conversionService.addConversion(conversion));
 
         //Then
         String expectedMessage = "Null conversion";
@@ -100,29 +132,28 @@ public class ConversionServiceUnitTests {
         assertEquals(actualMessage, expectedMessage);
     }
 
-    @Test
-    public void whenAddNewConversion_thenConversionIsSaved() {
+    @ParameterizedTest
+    @MethodSource("generateConversion")
+    public void whenAddNewConversion_thenConversionIsSaved(Conversion conversion) {
         //Given
-        Integer idConversion = 5;
-        Conversion conversion = new Conversion();
-        conversion.setIdConversion(idConversion);
-        Mockito.when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.empty());
-        Mockito.when(conversionRepository.save(conversion)).thenReturn(conversion);
+        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+                .thenReturn(Optional.empty());
+        Mockito.when(conversionRepository.save(conversion))
+                .thenReturn(conversion);
 
         //When
         Conversion result = conversionService.addConversion(conversion);
 
         //Then
-        assertThat(result.getIdConversion()).isEqualTo(idConversion);
+        assertThat(result.getIdConversion()).isEqualTo(conversion.getIdConversion());
     }
 
-    @Test
-    public void whenAddExistingConversion_thenThrowNullPointerException() {
+    @ParameterizedTest
+    @MethodSource("generateConversion")
+    public void whenAddExistingConversion_thenThrowNullPointerException(Conversion conversion) {
         //Given
-        Integer idConversion = 5;
-        Conversion conversion = new Conversion();
-        conversion.setIdConversion(idConversion);
-        Mockito.when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.of(conversion));
+        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+                .thenReturn(Optional.of(conversion));
 
         //When
         Exception exception = assertThrows(NullPointerException.class,
@@ -134,11 +165,12 @@ public class ConversionServiceUnitTests {
         assertEquals(actualMessage, expectedMessage);
     }
 
-    @Test
-    public void whenConversionIsNull_thenUpdateConversionThrowsNullPointerException() {
+    @ParameterizedTest
+    @NullSource
+    public void whenConversionIsNull_thenUpdateConversionThrowsNullPointerException(Conversion conversion) {
         //When
         Exception exception = assertThrows(NullPointerException.class,
-                () -> conversionService.updateConversion(null));
+                () -> conversionService.updateConversion(conversion));
 
         //Then
         String expectedMessage = "Null conversion";
@@ -146,13 +178,12 @@ public class ConversionServiceUnitTests {
         assertEquals(actualMessage, expectedMessage);
     }
 
-    @Test
-    public void whenUpdateNonExistingConversion_thenThrowNullPointerException() {
+    @ParameterizedTest
+    @MethodSource("generateConversion")
+    public void whenUpdateNonExistingConversion_thenThrowNullPointerException(Conversion conversion) {
         //Given
-        Integer nonValidIdConversion = 1;
-        Conversion conversion = new Conversion();
-        conversion.setIdConversion(nonValidIdConversion);
-        Mockito.when(conversionRepository.findByIdConversion(nonValidIdConversion)).thenReturn(Optional.empty());
+        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+                .thenReturn(Optional.empty());
 
         //When
         Exception exception = assertThrows(NullPointerException.class,
@@ -164,35 +195,26 @@ public class ConversionServiceUnitTests {
         assertEquals(actualMessage, expectedMessage);
     }
 
-    @Test
-    public void whenUpdateExistingConversion_thenConversionIsReturned() {
+    @ParameterizedTest
+    @MethodSource("generateConversion")
+    public void whenUpdateExistingConversion_thenConversionIsReturned(Conversion conversion) {
         //Given
-        Integer idConversion = 1;
-        Conversion conversion = new Conversion();
-        conversion.setIdConversion(idConversion);
-        Mockito.when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.of(conversion));
+        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+                .thenReturn(Optional.of(conversion));
         Mockito.when(conversionRepository.save(conversion)).thenReturn(conversion);
 
         //When
         Conversion result = conversionService.updateConversion(conversion);
 
         //Then
-        assertThat(result.getIdConversion()).isEqualTo(idConversion);
+        assertThat(result.getIdConversion()).isEqualTo(conversion.getIdConversion());
     }
 
-    @Test
-    public void whenUpdateConversionInExistingConversion_thenAllFieldsAreUpdated() {
+    @ParameterizedTest
+    @MethodSource("generateConversion")
+    public void whenUpdateConversionInExistingConversion_thenAllFieldsAreUpdated(Conversion conversionOld) {
         //Given
-        Integer idConversion = 1;
-        Conversion conversionOld = new Conversion();
-        conversionOld.setIdConversion(idConversion);
-        double oldValue = 100;
-        Currency oldCurrencyFrom = Currency.RSD;
-        Currency oldCurrencyTo = Currency.EUR;
-        conversionOld.setValue(oldValue);
-        conversionOld.setCurrencyFrom(oldCurrencyFrom);
-        conversionOld.setCurrencyTo(oldCurrencyTo);
-
+        int idConversion = conversionOld.getIdConversion();
         Conversion conversionNew = new Conversion();
         conversionNew.setIdConversion(idConversion);
         double newValue = 200;
@@ -214,15 +236,16 @@ public class ConversionServiceUnitTests {
         assertThat(resultConversion.getCurrencyTo()).isEqualTo(newCurrencyTo);
     }
 
-    @Test
-    public void whenBankIsNull_thenConvertThrowsNullPointerException() {
+    @ParameterizedTest
+    @NullSource
+    public void whenBankIsNull_thenConvertThrowsNullPointerException(Bank bank) {
         //Given
         Currency currencyFrom = Currency.EUR;
         Currency currencyTo = Currency.RSD;
 
         //When
         Exception exception = assertThrows(NullPointerException.class,
-                () -> conversionService.convert(currencyFrom, currencyTo, null));
+                () -> conversionService.convert(currencyFrom, currencyTo, bank));
 
         //Then
         String expectedMessage = "Null bank";
@@ -230,12 +253,13 @@ public class ConversionServiceUnitTests {
         assertEquals(actualMessage, expectedMessage);
     }
 
-    @Test
-    public void whenCurrencyFromOrCurrencyToIsNull_thenConvertThrowsNullPointerException() {
+    @ParameterizedTest
+    @MethodSource("generateBank")
+    public void whenCurrencyFromOrCurrencyToIsNull_thenConvertThrowsNullPointerException(Bank bank) {
         //Given
-        Currency currencyFrom = Currency.EUR;
-        Currency currencyTo = Currency.RSD;
-        Bank bank = new Bank();
+        Conversion conversion = bank.getExchangeRates().getConversions().get(0);
+        Currency currencyFrom = conversion.getCurrencyFrom();
+        Currency currencyTo = conversion.getCurrencyTo();
 
         //When
         Exception exceptionCurrencyFrom = assertThrows(NullPointerException.class,
@@ -252,17 +276,15 @@ public class ConversionServiceUnitTests {
         assertEquals(actualMessageTo, expectedMessage);
     }
 
-    @Test
-    public void whenConvertCallWithNonExistingConversion_thenThrowNullPointerException() {
+    @ParameterizedTest
+    @MethodSource("generateBank")
+    public void whenConvertCallWithNonExistingConversion_thenThrowNullPointerException(Bank bank) {
         //Given
-        Currency currencyFrom = Currency.EUR;
-        Currency currencyTo = Currency.RSD;
-        ExchangeRates exchangeRates = new ExchangeRates();
-        exchangeRates.setIdExchangeRates(1);
-        Bank bank = new Bank();
-        bank.setExchangeRates(exchangeRates);
+        Conversion conversion = bank.getExchangeRates().getConversions().get(0);
+        Currency currencyFrom = conversion.getCurrencyFrom();
+        Currency currencyTo = conversion.getCurrencyTo();
         Mockito.when(conversionRepository.findByCurrencyFromAndCurrencyToAndExchangeRates(
-                currencyFrom, currencyTo, exchangeRates)).thenReturn(Optional.empty());
+                currencyFrom, currencyTo, bank.getExchangeRates())).thenReturn(Optional.empty());
 
         //When
         Exception exception = assertThrows(NullPointerException.class,
@@ -275,29 +297,18 @@ public class ConversionServiceUnitTests {
     }
 
 
-    @Test
-    public void whenConvertExists_thenConversionValueIsReturned() {
+    @ParameterizedTest
+    @MethodSource("generateBank")
+    public void whenConvertExists_thenConversionValueIsReturned(Bank bank) {
         //Given
-        Currency currencyFrom = Currency.EUR;
-        Currency currencyTo = Currency.RSD;
-        double value = 0.75;
+        Conversion conversion = bank.getExchangeRates().getConversions().get(0);
+        Currency currencyFrom = conversion.getCurrencyFrom();
+        Currency currencyTo = conversion.getCurrencyTo();
+        double value = conversion.getValue();
 
-        List<Conversion> conversions = new ArrayList<>();
-        Conversion conversion = new Conversion();
-        conversion.setIdConversion(1);
-        conversion.setCurrencyFrom(currencyFrom);
-        conversion.setCurrencyTo(currencyTo);
-        conversion.setValue(value);
-        conversions.add(conversion);
 
-        ExchangeRates exchangeRates = new ExchangeRates();
-        exchangeRates.setIdExchangeRates(1);
-        exchangeRates.setConversions(conversions);
-
-        Bank bank = new Bank();
-        bank.setExchangeRates(exchangeRates);
         Mockito.when(conversionRepository.findByCurrencyFromAndCurrencyToAndExchangeRates(
-                currencyFrom, currencyTo, exchangeRates)).thenReturn(Optional.of(conversion));
+                currencyFrom, currencyTo, bank.getExchangeRates())).thenReturn(Optional.of(conversion));
 
         //When
         double resultValue = conversionService.convert(currencyFrom, currencyTo, bank);
