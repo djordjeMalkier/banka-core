@@ -17,19 +17,16 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 
 @SpringBootTest
 public class ConversionServiceUnitTests {
-
-
     @Autowired
     private ConversionService conversionService;
-
     @MockBean
     private ConversionRepository conversionRepository;
+
 
     @Test
     public void whenValidId_thenConversionShouldBeFound() {
@@ -54,13 +51,24 @@ public class ConversionServiceUnitTests {
 
         //When
         Exception exception = assertThrows(NullPointerException.class, () -> {
-            conversionService.findByIdConversion(nonValidIdConversion);
-        });
+            conversionService.findByIdConversion(nonValidIdConversion); });
 
         //Then
         String expectedMessage = "The conversion dose not exist.";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void whenConversionIsNull_thenDeleteConversionThrowsNullPointerException() {
+        //When
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            conversionService.deleteConversion(null); });
+
+        //Then
+        String expectedMessage = "Conversion does not exist";
+        String actualMessage = exception.getMessage();
+        assertEquals(actualMessage, expectedMessage);
     }
 
     @Test
@@ -81,6 +89,18 @@ public class ConversionServiceUnitTests {
     }
 
     @Test
+    public void whenConversionIsNull_thenAddConversionThrowsNullPointerException() {
+        //When
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            conversionService.addConversion(null); });
+
+        //Then
+        String expectedMessage = "Null conversion";
+        String actualMessage = exception.getMessage();
+        assertEquals(actualMessage, expectedMessage);
+    }
+
+    @Test
     public void whenAddNewConversion_thenConversionIsSaved() {
         //Given
         Integer idConversion = 5;
@@ -93,7 +113,7 @@ public class ConversionServiceUnitTests {
         Conversion result = conversionService.addConversion(conversion);
 
         //Then
-        assertThat(result.getIdConversion()).isEqualTo(conversion.getIdConversion());
+        assertThat(result.getIdConversion()).isEqualTo(idConversion);
     }
 
     @Test
@@ -106,13 +126,24 @@ public class ConversionServiceUnitTests {
 
         //When
         Exception exception = assertThrows(NullPointerException.class, () -> {
-            conversionService.addConversion(conversion);
-        });
+            conversionService.addConversion(conversion); });
 
         //Then
         String expectedMessage = "This conversion already exists!";
         String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains(expectedMessage));
+        assertEquals(actualMessage, expectedMessage);
+    }
+
+    @Test
+    public void whenConversionIsNull_thenUpdateConversionThrowsNullPointerException() {
+        //When
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            conversionService.updateConversion(null); });
+
+        //Then
+        String expectedMessage = "Null conversion";
+        String actualMessage = exception.getMessage();
+        assertEquals(actualMessage, expectedMessage);
     }
 
     @Test
@@ -125,13 +156,12 @@ public class ConversionServiceUnitTests {
 
         //When
         Exception exception = assertThrows(NullPointerException.class, () -> {
-            conversionService.updateConversion(conversion);
-        });
+            conversionService.updateConversion(conversion); });
 
         //Then
         String expectedMessage = "No such conversion exists!";
         String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains(expectedMessage));
+        assertEquals(actualMessage, expectedMessage);
     }
 
     @Test
@@ -147,34 +177,83 @@ public class ConversionServiceUnitTests {
         Conversion result = conversionService.updateConversion(conversion);
 
         //Then
-        assertThat(result.getIdConversion()).isEqualTo(conversion.getIdConversion());
+        assertThat(result.getIdConversion()).isEqualTo(idConversion);
     }
 
     @Test
-    public void whenUpdateValueInExistingConversion_thenValueIsUpdated() {
+    public void whenUpdateConversionInExistingConversion_thenAllFieldsAreUpdated() {
         //Given
         Integer idConversion = 1;
         Conversion conversionOld = new Conversion();
         conversionOld.setIdConversion(idConversion);
         double oldValue = 100;
+        Currency oldCurrencyFrom = Currency.RSD;
+        Currency oldCurrencyTo = Currency.EUR;
         conversionOld.setValue(oldValue);
+        conversionOld.setCurrencyFrom(oldCurrencyFrom);
+        conversionOld.setCurrencyTo(oldCurrencyTo);
 
         Conversion conversionNew = new Conversion();
         conversionNew.setIdConversion(idConversion);
         double newValue = 200;
+        Currency newCurrencyFrom = Currency.EUR;
+        Currency newCurrencyTo = Currency.RSD;
         conversionNew.setValue(newValue);
+        conversionNew.setCurrencyFrom(newCurrencyFrom);
+        conversionNew.setCurrencyTo(newCurrencyTo);
         Mockito.when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.of(conversionOld));
         Mockito.when(conversionRepository.save(conversionOld)).thenReturn(conversionNew);
 
         //When
-        Conversion result = conversionService.updateConversion(conversionOld);
+        Conversion resultConversion = conversionService.updateConversion(conversionOld);
 
         //Then
-        assertThat(result.getValue()).isEqualTo(conversionNew.getValue());
+        assertThat(resultConversion.getIdConversion()).isEqualTo(idConversion);
+        assertThat(resultConversion.getValue()).isEqualTo(newValue);
+        assertThat(resultConversion.getCurrencyFrom()).isEqualTo(newCurrencyFrom);
+        assertThat(resultConversion.getCurrencyTo()).isEqualTo(newCurrencyTo);
     }
 
     @Test
-    public void whenConvertNonExistingConversion_thenThrowNullPointerException() {
+    public void whenBankIsNull_thenConvertThrowsNullPointerException() {
+        //Given
+        Currency currencyFrom = Currency.EUR;
+        Currency currencyTo = Currency.RSD;
+
+        //When
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            conversionService.convert(currencyFrom, currencyTo, null); });
+
+        //Then
+        String expectedMessage = "Null bank";
+        String actualMessage = exception.getMessage();
+        assertEquals(actualMessage, expectedMessage);
+    }
+
+    @Test
+    public void whenCurrencyFromOrCurrencyToIsNull_thenConvertThrowsNullPointerException() {
+        //Given
+        Currency currencyFrom = Currency.EUR;
+        Currency currencyTo = Currency.RSD;
+        Bank bank = new Bank();
+
+        //When
+        Exception exceptionCurrencyFrom = assertThrows(NullPointerException.class, () -> {
+            conversionService.convert(null, currencyTo, bank); });
+
+        Exception exceptionCurrencyTo = assertThrows(NullPointerException.class, () -> {
+            conversionService.convert(currencyFrom, null, bank); });
+
+        //Then
+        String expectedMessage = "Null currency";
+        String actualMessageFrom = exceptionCurrencyFrom.getMessage();
+        String actualMessageTo = exceptionCurrencyTo.getMessage();
+        assertEquals(actualMessageFrom, expectedMessage);
+        assertEquals(actualMessageTo, expectedMessage);
+    }
+
+    @Test
+    public void whenConvertCallWithNonExistingConversion_thenThrowNullPointerException() {
         //Given
         Currency currencyFrom = Currency.EUR;
         Currency currencyTo = Currency.RSD;
@@ -187,13 +266,12 @@ public class ConversionServiceUnitTests {
 
         //When
         Exception exception = assertThrows(NullPointerException.class, () -> {
-            conversionService.convert(currencyFrom, currencyTo, bank);
-        });
+            conversionService.convert(currencyFrom, currencyTo, bank); });
 
         //Then
         String expectedMessage = "Conversion " + currencyFrom + " to " + currencyTo + " not found";
         String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains(expectedMessage));
+        assertEquals(actualMessage, expectedMessage);
     }
 
 
