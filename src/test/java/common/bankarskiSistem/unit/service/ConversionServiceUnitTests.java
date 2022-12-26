@@ -12,14 +12,13 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ConversionServiceUnitTests {
@@ -34,7 +33,7 @@ public class ConversionServiceUnitTests {
     @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenValidId_thenConversionShouldBeFound(Conversion conversion) {
         //Given
-        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+        when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
                 .thenReturn(Optional.of(conversion));
 
         //When
@@ -48,7 +47,7 @@ public class ConversionServiceUnitTests {
     @ValueSource(ints = {1, 5})
     public void whenInvalidId_thenThrowNullPointerException(Integer nonValidIdConversion) {
         //Given
-        Mockito.when(conversionRepository.findByIdConversion(nonValidIdConversion)).thenReturn(Optional.empty());
+        when(conversionRepository.findByIdConversion(nonValidIdConversion)).thenReturn(Optional.empty());
 
         //When
         Exception exception = assertThrows(NullPointerException.class,
@@ -80,7 +79,7 @@ public class ConversionServiceUnitTests {
         Conversion result = conversionService.deleteConversion(conversion);
 
         //Then
-        Mockito.verify(conversionRepository, times(1))
+        verify(conversionRepository, times(1))
                 .delete(conversion);
         assertThat(result.getIdConversion()).isEqualTo(conversion.getIdConversion());
     }
@@ -102,9 +101,9 @@ public class ConversionServiceUnitTests {
     @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenAddNewConversion_thenConversionIsSaved(Conversion conversion) {
         //Given
-        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+        when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
                 .thenReturn(Optional.empty());
-        Mockito.when(conversionRepository.save(conversion))
+        when(conversionRepository.save(any(Conversion.class)))
                 .thenReturn(conversion);
 
         //When
@@ -118,7 +117,7 @@ public class ConversionServiceUnitTests {
     @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenAddExistingConversion_thenThrowNullPointerException(Conversion conversion) {
         //Given
-        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+        when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
                 .thenReturn(Optional.of(conversion));
 
         //When
@@ -148,7 +147,7 @@ public class ConversionServiceUnitTests {
     @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenUpdateNonExistingConversion_thenThrowNullPointerException(Conversion conversion) {
         //Given
-        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+        when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
                 .thenReturn(Optional.empty());
 
         //When
@@ -165,9 +164,9 @@ public class ConversionServiceUnitTests {
     @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenUpdateExistingConversion_thenConversionIsReturned(Conversion conversion) {
         //Given
-        Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
+        when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
                 .thenReturn(Optional.of(conversion));
-        Mockito.when(conversionRepository.save(conversion)).thenReturn(conversion);
+        when(conversionRepository.save(any(Conversion.class))).thenReturn(conversion);
 
         //When
         Conversion result = conversionService.updateConversion(conversion);
@@ -189,8 +188,8 @@ public class ConversionServiceUnitTests {
         conversionNew.setValue(newValue);
         conversionNew.setCurrencyFrom(newCurrencyFrom);
         conversionNew.setCurrencyTo(newCurrencyTo);
-        Mockito.when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.of(conversionOld));
-        Mockito.when(conversionRepository.save(conversionOld)).thenReturn(conversionNew);
+        when(conversionRepository.findByIdConversion(idConversion)).thenReturn(Optional.of(conversionOld));
+        when(conversionRepository.save(any(Conversion.class))).thenReturn(conversionNew);
 
         //When
         Conversion resultConversion = conversionService.updateConversion(conversionOld);
@@ -249,7 +248,7 @@ public class ConversionServiceUnitTests {
         Conversion conversion = bank.getExchangeRates().getConversions().get(0);
         Currency currencyFrom = conversion.getCurrencyFrom();
         Currency currencyTo = conversion.getCurrencyTo();
-        Mockito.when(conversionRepository.findByCurrencyFromAndCurrencyToAndExchangeRates(
+        when(conversionRepository.findByCurrencyFromAndCurrencyToAndExchangeRates(
                 currencyFrom, currencyTo, bank.getExchangeRates())).thenReturn(Optional.empty());
 
         //When
@@ -273,7 +272,7 @@ public class ConversionServiceUnitTests {
         double value = conversion.getValue();
 
 
-        Mockito.when(conversionRepository.findByCurrencyFromAndCurrencyToAndExchangeRates(
+        when(conversionRepository.findByCurrencyFromAndCurrencyToAndExchangeRates(
                 currencyFrom, currencyTo, bank.getExchangeRates())).thenReturn(Optional.of(conversion));
 
         //When
