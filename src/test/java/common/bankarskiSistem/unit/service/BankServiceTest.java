@@ -35,7 +35,7 @@ class BankServiceTest {
     private BankService bankService;
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#createBank_params")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void canCreateBank(Bank bank, Bank saved) throws NameOfTheBankAlreadyExistException {
         //when
         when(bankRepository.save(any(Bank.class)))
@@ -44,17 +44,17 @@ class BankServiceTest {
         Bank actual = bankService.createBank(bank);
 
         //then
-//        ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
-//        verify(bankRepository).save(bankArgumentCaptor.capture());
+//       ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
+//       verify(bankRepository).save(bankArgumentCaptor.capture());
 //
-//        Bank capturedBank = bankArgumentCaptor.getValue();
+//       Bank capturedBank = bankArgumentCaptor.getValue();
 
         verify(bankRepository, times(1)).findByName(anyString());
         assertThat(actual).isEqualTo(saved);
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#createBank_params")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void whenNameAlreadyExists_ThenCreateBankThrowsNameOfTheBankAlreadyExistException(Bank bank) {
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
 
@@ -72,7 +72,7 @@ class BankServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#deleteBank_params")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void canDeleteBank(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         Mockito.when(bankRepository.deleteByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
@@ -85,7 +85,7 @@ class BankServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void whenBankDoesNotExists_ThenDeleteBankThrowsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
@@ -95,7 +95,7 @@ class BankServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#findById_params")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void canFindBankById(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
 
@@ -107,7 +107,7 @@ class BankServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void whenBankDoesNotExists_ThenFindByIdThrowsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
@@ -142,7 +142,7 @@ class BankServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void whenBankDoesNotExists_ThenUpdateBankThrowsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
@@ -153,7 +153,7 @@ class BankServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#justBankObject_param")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void whenNameAlreadyExists_ThenUpdateBankThrowsNameOfTheBankAlreadyExistException(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
@@ -165,7 +165,7 @@ class BankServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#addExchangeRates_params")
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#exchangeRates_params")
     void addExchangeRates(Bank bank, ExchangeRates exchangeRates) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         Mockito.when(exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates())).thenReturn(Optional.of(exchangeRates));

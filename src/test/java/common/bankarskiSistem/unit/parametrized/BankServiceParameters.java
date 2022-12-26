@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import java.util.stream.Stream;
 
 public final class BankServiceParameters {
-    public static Stream<Arguments> createBank_params() {
+    public static Stream<Arguments> bank_params() {
         String name = "Intesa";
         String address = "Vojvode Vlahovica 1";
         Bank bank = new Bank();
@@ -17,28 +17,6 @@ public final class BankServiceParameters {
         Bank saved = new Bank(1, name, address);
 
         return Stream.of(Arguments.of(bank, saved));
-    }
-
-    public static Stream<Arguments> findById_params() {
-        Integer idBank = 1;
-        Bank bank = new Bank();
-        bank.setIdBank(idBank);
-
-        return Stream.of(Arguments.of(bank));
-    }
-
-    public static Stream<Arguments> deleteBank_params() {
-        Integer idBank = 1;
-        Bank bank = new Bank();
-        bank.setIdBank(idBank);
-
-        return Stream.of(Arguments.of(bank));
-    }
-
-    public static Stream<Arguments> justBankObject_param() {
-        Bank bank = new Bank();
-
-        return Stream.of(Arguments.of(bank));
     }
 
     public static Stream<Arguments> bankObjectAndIdExchangeRates_param() {
@@ -64,7 +42,7 @@ public final class BankServiceParameters {
         return Stream.of(Arguments.of(bankOld, bankNew));
     }
 
-    public static Stream<Arguments> addExchangeRates_params() {
+    public static Stream<Arguments> exchangeRates_params() {
         Integer idExchangeRates = 1;
         String nameExchangeRates = "Kurs 1";
         ExchangeRates exchangeRates = new ExchangeRates();

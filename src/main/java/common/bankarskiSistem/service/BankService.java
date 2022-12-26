@@ -21,12 +21,6 @@ public class BankService {
     @Autowired
     private ExchangeRatesRepository exchangeRatesRepository;
 
-    public BankService(BankRepository bankRepository, ExchangeRatesRepository exchangeRatesRepository) {
-        this.bankRepository = bankRepository;
-        this.exchangeRatesRepository = exchangeRatesRepository;
-    }
-
-
     /**
      *
      * @param bank the bank
