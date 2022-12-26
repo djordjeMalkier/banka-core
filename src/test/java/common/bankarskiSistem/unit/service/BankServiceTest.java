@@ -44,10 +44,10 @@ class BankServiceTest {
         Bank actual = bankService.createBank(bank);
 
         //then
-//      ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
-//      verify(bankRepository).save(bankArgumentCaptor.capture());
-//
-//      Bank capturedBank = bankArgumentCaptor.getValue();
+      /*ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
+        verify(bankRepository).save(bankArgumentCaptor.capture());
+
+        Bank capturedBank = bankArgumentCaptor.getValue();*/
 
         verify(bankRepository, times(1)).findByName(anyString());
         assertThat(actual).isEqualTo(saved);
@@ -118,7 +118,7 @@ class BankServiceTest {
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#updateBank_params")
-    void updateBankName_ok(Bank bankOld, Bank bankNew) throws NameOfTheBankAlreadyExistException {
+    void updateBank_ok(Bank bankOld, Bank bankNew) throws NameOfTheBankAlreadyExistException {
         Mockito.when(bankRepository.findByIdBank(bankOld.getIdBank())).thenReturn(Optional.of(bankOld));
         Mockito.when(bankRepository.save(bankOld)).thenReturn(bankNew);
         //when
@@ -127,9 +127,10 @@ class BankServiceTest {
         //then
         verify(bankRepository, times(1)).findByName(anyString());
         assertThat(updateBank.getName()).isEqualTo(bankNew.getName());
+        assertThat(updateBank.getAddress()).isEqualTo(bankNew.getAddress());
     }
 
-    @ParameterizedTest
+    /*@ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#updateBank_params")
     void updateBankAddress_ok(Bank bankOld, Bank bankNew) throws NameOfTheBankAlreadyExistException {
         Mockito.when(bankRepository.findByIdBank(bankOld.getIdBank())).thenReturn(Optional.of(bankOld));
@@ -140,7 +141,7 @@ class BankServiceTest {
         //then
         verify(bankRepository, times(1)).findByName(anyString());
         assertThat(updateBank.getAddress()).isEqualTo(bankNew.getAddress());
-    }
+    }*/
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
