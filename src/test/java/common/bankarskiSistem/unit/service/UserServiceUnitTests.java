@@ -4,49 +4,52 @@ import common.bankarskiSistem.model.*;
 import common.bankarskiSistem.repository.BankAccountRepository;
 import common.bankarskiSistem.repository.UserRepository;
 import common.bankarskiSistem.service.UserService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mapstruct.control.MappingControl;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class UserServiceUnitTests {
-	@Autowired
+	@InjectMocks
 	private UserService userService;
 
-	@MockBean
+	@Mock
 	private UserRepository userRepository;
 
-	@MockBean
+	@Mock
 	private BankAccountRepository bankAccountRepository;
 
-	@Test
-	public void whenValidPersonalId_thenUserShouldBeFound() {
-		String personalId = "2011445745511";
-		String name = "Pera";
-		String surname = "Petrovic";
-		String address = "Adr 1";
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	public void whenValidPersonalId_thenUserShouldBeFound(User user) {
 
-		User user = new User(personalId, name, surname, address);
+		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
 
-		Mockito.when(userRepository.findByPersonalId(personalId)).thenReturn(Optional.of(user));
+		User found = userService.getUserByPersonalID(user.getPersonalId());
 
-		User found = userService.getUserByPersonalID(personalId);
-
-		assertThat(found.getPersonalId()).isEqualTo(personalId);
+		assertThat(found.getPersonalId()).isEqualTo(user.getPersonalId());
 	}
 
-	@Test
-	public void whenNonValidPersonalId_thenNullPointerExceptionIsThrown() {
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	public void whenNonValidPersonalId_thenNullPointerExceptionIsThrown(User user) {
 
 		Exception exception = assertThrows(NullPointerException.class, () ->{
 			userService.getUserByPersonalID(null);
@@ -58,81 +61,122 @@ class UserServiceUnitTests {
 		assertEquals(expectedMessage,actualMessage);
 	}
 
-	@Test
-	public void whenNonExistingPersonalId_thenUserShouldNotBeFound() {
-		String personalId = "2011445745511";
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	public void whenNonExistingPersonalId_thenUserShouldNotBeFound(User user) {
 
-		Mockito.when(userRepository.findByPersonalId(personalId)).thenReturn(Optional.empty());
+		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.empty());
 
 
 		Exception exception = assertThrows(NullPointerException.class, () ->{
-			userService.getUserByPersonalID(personalId);
+			userService.getUserByPersonalID(user.getPersonalId());
 		});
 
-		String expectedMessage = "User [" + personalId + "]" + " not found";
+		String expectedMessage = "User [" + user.getPersonalId() + "]" + " not found";
+		String actualMessage = exception.getMessage();
+
+		assertEquals(expectedMessage,actualMessage);
+	}
+
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	public void whenValidBankAccountId_thenBankAccountShouldBeFound(User user, BankAccount bankAccount) {
+
+
+		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
+
+		BankAccount found = userService.getBankAccountByID(user.getPersonalId(),bankAccount.getIdAccount());
+
+		assertThat(found.getIdAccount()).isEqualTo(bankAccount.getIdAccount()
+		);
+		assertThat(found).isNotNull();
+	}
+
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	public void whenNonValidBankAccountId_thenNullShouldBeFound(User user) {
+		Integer account_id = 1;
+
+		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
+
+		BankAccount found = userService.getBankAccountByID(user.getPersonalId(),account_id);
+//verify samo :D
+		assertThat(found).isNull();
+	}
+
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	public void whenNonValidBankAccountId_thenNullPointerExceptionIsThrownDeletingBankAccount(User user) {
+
+		Exception exception = assertThrows(NullPointerException.class, () ->{
+			userService.deleteBankAccountById(user.getPersonalId(),null);
+		});
+
+		String expectedMessage = "Null account id";
+		String actualMessage = exception.getMessage();
+
+		assertEquals(expectedMessage,actualMessage);
+	}
+
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	public void whenNonValidPersonalID_thenNullPointerExceptionIsThrownDeletingBankAccount(User user, BankAccount bankAccount) {
+
+		Exception exception = assertThrows(NullPointerException.class, () ->{
+			userService.deleteBankAccountById(null,bankAccount.getIdAccount());
+		});
+
+		String expectedMessage = "Null personal id";
 		String actualMessage = exception.getMessage();
 
 		assertEquals(expectedMessage,actualMessage);
 	}
 
 	@Test
-	public void whenValidBankAccountId_thenBankAccountShouldBeFound() {
-		String personalId = "2011445745511";
-		String user_name = "Pera";
-		String user_surname = "Petrovic";
-		String user_address = "Adr 1";
-
-		User user = new User(personalId, user_name, user_surname, user_address);
-
-		Integer id_bank = 1;
-		String bank_address = "Mihaila Pupina 13";
-		String bank_name = "Banka Intesa";
-
-		Bank bank = new Bank(id_bank, bank_name, bank_address);
-
-		Integer account_id = 1;
-		AccountType accountType = AccountType.FOREIGN;
+	public void whenNonValidPersonalID_thenNullPointerExceptionIsThrownGettingBalance() {
+		Integer accountID = 1;
 		Currency currency = Currency.EUR;
 
-		BankAccount bankAccount = new BankAccount(accountType,currency,user,bank,account_id);
+		Exception exception = assertThrows(NullPointerException.class, () ->{
+			userService.getBalance(null,accountID,Optional.of(currency));
+		});
 
-		user.addAccount(bankAccount);
+		String expectedMessage = "Null personal id";
+		String actualMessage = exception.getMessage();
 
-		Mockito.when(bankAccountRepository.findById(account_id)).thenReturn(Optional.of(bankAccount));
-		Mockito.when(userRepository.findByPersonalId(personalId)).thenReturn(Optional.of(user));
-
-		BankAccount found = userService.getBankAccountByID(personalId,account_id);
-
-		assertThat(found.getIdAccount()).isEqualTo(account_id);
+		assertEquals(expectedMessage,actualMessage);
 	}
 
-	@Test
-	public void whenNonValidBankAccountId_thenNullShouldBeFound() {
-		String personalId = "2011445745511";
-		String user_name = "Pera";
-		String user_surname = "Petrovic";
-		String user_address = "Adr 1";
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	public void whenNonAccountID_thenNullPointerExceptionIsThrownGettingBalance(User user, BankAccount bankAccount) {
 
-		User user = new User(personalId, user_name, user_surname, user_address);
+		Exception exception = assertThrows(NullPointerException.class, () ->{
+			userService.getBalance(user.getPersonalId(),null,Optional.of(bankAccount.getCurrency()));
+		});
 
-		Integer id_bank = 1;
-		String bank_address = "Mihaila Pupina 13";
-		String bank_name = "Banka Intesa";
+		String expectedMessage = "No account";
+		String actualMessage = exception.getMessage();
 
-		Bank bank = new Bank(id_bank, bank_name, bank_address);
-
-		Integer account_id = 1;
-
-		Mockito.when(bankAccountRepository.findById(account_id)).thenReturn(Optional.empty());
-		Mockito.when(userRepository.findByPersonalId(personalId)).thenReturn(Optional.of(user));
-
-		BankAccount found = userService.getBankAccountByID(personalId,account_id);
-
-		assertThat(found).isNull();
+		assertEquals(expectedMessage,actualMessage);
 	}
 
-	@Test
-	void contextLoads() {
+	@ParameterizedTest
+	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	public void whenNonValidCurrency_thenNullPointerExceptionIsThrownGettingBalance(User user, BankAccount bankAccount) {
+
+		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
+
+		Exception exception = assertThrows(NullPointerException.class, () ->{
+			userService.getBalance(user.getPersonalId(),bankAccount.getIdAccount()
+					,null);
+		});
+
+		String expectedMessage = "Cannot invoke \"java.util.Optional.isPresent()\" because \"currencyTo\" is null";
+		String actualMessage = exception.getMessage();
+
+		assertEquals(expectedMessage,actualMessage);
 	}
+
 
 }
