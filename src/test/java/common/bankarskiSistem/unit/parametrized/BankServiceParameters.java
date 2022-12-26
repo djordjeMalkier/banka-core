@@ -29,17 +29,28 @@ public final class BankServiceParameters {
     public static Stream<Arguments> updateBank_params() {
         Integer idBank = 1;
 
-        Bank bankOld = new Bank();
-        bankOld.setIdBank(idBank);
+        Bank bankOld;
         String nameOld = "Erste";
-        bankOld.setName(nameOld);
+        String addressOld = "Vojvode Vlahovica 1";
 
-        Bank bankNew = new Bank();
-        bankNew.setIdBank(idBank);
+        Bank bankNew;
         String nameNew = "Intesa";
-        bankNew.setName(nameNew);
+        String addressNew = "Stepe Stepanovica 1";
 
-        return Stream.of(Arguments.of(bankOld, bankNew));
+        return Stream.of(
+                Arguments.of(
+                    bankOld = new Bank(idBank, nameOld, addressOld),
+                    bankNew = new Bank(idBank, nameNew, addressOld)
+                ),
+                Arguments.of(
+                    bankOld = new Bank(idBank, nameOld, addressOld),
+                    bankNew = new Bank(idBank, nameOld, addressNew)
+                ),
+                Arguments.of(
+                    bankOld = new Bank(idBank, nameOld, addressOld),
+                    bankNew = new Bank(idBank, nameNew, addressNew)
+                )
+        );
     }
 
     public static Stream<Arguments> exchangeRates_params() {

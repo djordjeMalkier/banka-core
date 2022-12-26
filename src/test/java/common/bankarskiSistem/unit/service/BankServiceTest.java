@@ -126,8 +126,9 @@ class BankServiceTest {
 
         //then
         verify(bankRepository, times(1)).findByName(anyString());
-        assertThat(updateBank.getName()).isEqualTo(bankNew.getName());
+
         assertThat(updateBank.getAddress()).isEqualTo(bankNew.getAddress());
+        assertThat(updateBank.getName()).isEqualTo(bankNew.getName());
     }
 
     /*@ParameterizedTest
