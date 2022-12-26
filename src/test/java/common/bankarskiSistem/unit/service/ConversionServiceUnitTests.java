@@ -3,12 +3,10 @@ package common.bankarskiSistem.unit.service;
 import common.bankarskiSistem.model.Bank;
 import common.bankarskiSistem.model.Conversion;
 import common.bankarskiSistem.model.Currency;
-import common.bankarskiSistem.model.ExchangeRates;
 import common.bankarskiSistem.repository.ConversionRepository;
 import common.bankarskiSistem.service.ConversionService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -17,10 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,39 +28,10 @@ public class ConversionServiceUnitTests {
     @Mock
     private ConversionRepository conversionRepository;
 
-    private static Conversion generateOneConversion() {
-        return new Conversion(
-                5,
-                Currency.EUR,
-                Currency.RSD,
-                0.75,
-                null);
-    }
-
-    private static Stream<Arguments> generateConversion(){
-        return Stream.of(Arguments.of(
-                generateOneConversion()));
-    }
-
-    private static Stream<Arguments> generateBank(){
-        return Stream.of(Arguments.of(
-                new Bank(
-                        1,
-                        "Bank Intesa",
-                        "Milutina Milankovica 1",
-                        null,
-                        new ExchangeRates(
-                                1,
-                                "kurs 1",
-                                new ArrayList<>(List.of(generateOneConversion())),
-                                null
-                                )
-                        )));
-    }
-
 
     @ParameterizedTest
-    @MethodSource("generateConversion")
+    //
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenValidId_thenConversionShouldBeFound(Conversion conversion) {
         //Given
         Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
@@ -108,7 +74,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateConversion")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenValidId_thenConversionShouldBeDeleted(Conversion conversion) {
         //When
         Conversion result = conversionService.deleteConversion(conversion);
@@ -133,7 +99,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateConversion")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenAddNewConversion_thenConversionIsSaved(Conversion conversion) {
         //Given
         Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
@@ -149,7 +115,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateConversion")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenAddExistingConversion_thenThrowNullPointerException(Conversion conversion) {
         //Given
         Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
@@ -179,7 +145,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateConversion")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenUpdateNonExistingConversion_thenThrowNullPointerException(Conversion conversion) {
         //Given
         Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
@@ -196,7 +162,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateConversion")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenUpdateExistingConversion_thenConversionIsReturned(Conversion conversion) {
         //Given
         Mockito.when(conversionRepository.findByIdConversion(conversion.getIdConversion()))
@@ -211,7 +177,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateConversion")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateConversion")
     public void whenUpdateConversionInExistingConversion_thenAllFieldsAreUpdated(Conversion conversionOld) {
         //Given
         int idConversion = conversionOld.getIdConversion();
@@ -254,7 +220,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateBank")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateBank")
     public void whenCurrencyFromOrCurrencyToIsNull_thenConvertThrowsNullPointerException(Bank bank) {
         //Given
         Conversion conversion = bank.getExchangeRates().getConversions().get(0);
@@ -277,7 +243,7 @@ public class ConversionServiceUnitTests {
     }
 
     @ParameterizedTest
-    @MethodSource("generateBank")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateBank")
     public void whenConvertCallWithNonExistingConversion_thenThrowNullPointerException(Bank bank) {
         //Given
         Conversion conversion = bank.getExchangeRates().getConversions().get(0);
@@ -298,7 +264,7 @@ public class ConversionServiceUnitTests {
 
 
     @ParameterizedTest
-    @MethodSource("generateBank")
+    @MethodSource("common.bankarskiSistem.parametrized.ConversionServiceParameters#generateBank")
     public void whenConvertExists_thenConversionValueIsReturned(Bank bank) {
         //Given
         Conversion conversion = bank.getExchangeRates().getConversions().get(0);
