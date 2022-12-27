@@ -7,7 +7,6 @@ import common.bankarskiSistem.model.ExchangeRates;
 import common.bankarskiSistem.model.User;
 import common.bankarskiSistem.repository.BankRepository;
 import common.bankarskiSistem.repository.ExchangeRatesRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
