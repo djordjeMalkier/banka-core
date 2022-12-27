@@ -1,4 +1,4 @@
-package common.bankarskiSistem.unit.parametrized;
+package common.bankarskiSistem.parametrized;
 
 import common.bankarskiSistem.model.Bank;
 import common.bankarskiSistem.model.BankAccount;
