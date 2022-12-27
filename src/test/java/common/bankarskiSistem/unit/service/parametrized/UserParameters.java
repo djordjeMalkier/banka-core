@@ -26,4 +26,18 @@ public class UserParameters {
 
         return Stream.of(Arguments.of(user1, user2));
     }
+
+    public static Stream<Arguments> generateUpdateUserWithNoPersonalId(){
+
+
+        User user = new User(
+                "",
+                "Drugi",
+                " korisnik",
+                "Adressa2"
+
+        );
+
+        return Stream.of(Arguments.of( user));
+    }
 }
