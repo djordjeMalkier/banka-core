@@ -10,6 +10,7 @@ import common.bankarskiSistem.service.UserService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -90,12 +91,12 @@ class UserServiceUnitTests {
 
 	@ParameterizedTest
 	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
-	public void getBankAccountByID_nonValidBankAccountId_nullReturned(User user) {
-		Integer account_id = 1;
+	@ValueSource(ints = {1,2})
+	public void getBankAccountByID_nonValidBankAccountId_nullReturned(User user, Integer nonValidBankAccountId) {
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
 
-		BankAccount found = userService.getBankAccountByID(user.getPersonalId(),account_id);
+		BankAccount found = userService.getBankAccountByID(user.getPersonalId(),nonValidBankAccountId);
 
 		assertThat(found).isNull();
 	}
@@ -103,7 +104,6 @@ class UserServiceUnitTests {
 	@ParameterizedTest
 	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
 	public void deleteBankAccountById_deleted(User user, BankAccount bankAccount) throws EntityNotFoundException {
-
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
 
@@ -182,8 +182,7 @@ class UserServiceUnitTests {
 
 	@ParameterizedTest
 	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
-	public void getBalance_NonValidPersonalID_NullPointerException(User user, BankAccount bankAccount) {
-		Integer accountID = 1;
+	public void getBalance_nullPersonalID_NullPointerException(User user, BankAccount bankAccount) {
 		Currency currency = Currency.EUR;
 
 		Exception exception = assertThrows(NullPointerException.class, () ->{
