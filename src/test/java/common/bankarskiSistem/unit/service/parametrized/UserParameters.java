@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 public class UserParameters {
 
-    public static Stream<Arguments> generateUpdate(){
+    public static Stream<Arguments> generateUpdateUser(){
         User user1 = new User(
                 "1111111111111",
                 "Prvi",

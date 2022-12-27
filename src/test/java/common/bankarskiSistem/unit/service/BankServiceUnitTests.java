@@ -96,7 +96,7 @@ public class BankServiceUnitTests {
 
 
     @ParameterizedTest
-    @MethodSource({"common.bankarskiSistem.unit.service.parametrized.ExchangeRatesParameters#generateUpdate"})
+    @MethodSource({"common.bankarskiSistem.unit.service.parametrized.ExchangeRatesParameters#generateUpdateExchangeRates"})
     void canUpdateExchangeRates(ExchangeRates exchangeRatesOld, ExchangeRates exchangeRatesNew){
 
         when(exchangeRatesRepository.findByIdExchangeRates(exchangeRatesOld.getIdExchangeRates())).thenReturn(Optional.of(exchangeRatesOld));

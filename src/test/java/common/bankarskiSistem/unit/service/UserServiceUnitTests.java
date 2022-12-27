@@ -33,18 +33,16 @@ class UserServiceUnitTests {
 	private UserService userService;
 
 	@ParameterizedTest
-	@MethodSource({"common.bankarskiSistem.unit.service.parametrized.UserParameters#generateUpdate"})
-	void canUpdateUser(User userOld, User userNew){
+	@MethodSource({"common.bankarskiSistem.unit.service.parametrized.UserParameters#generateUpdateUser"})
+	void canUpdateUser(User userOld, User userNew) throws EntityNotFoundException {
 
 		when(userRepository.getReferenceById(userOld.getPersonalId())).thenReturn(userOld);
 		when(userRepository.save(any(User.class))).thenReturn(userNew);
 
 		User result= null;
-		try {
+
 			result = userService.updateUser(userOld);
-		} catch (EntityNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+
 
 		assertThat(result.getPersonalId()).isEqualTo(userNew.getPersonalId());
 
@@ -52,7 +50,7 @@ class UserServiceUnitTests {
 
 	@ParameterizedTest
 	@NullSource
-	void canUpdateNullUser(User user) {
+	void canUpdateWithEmptyUser(User user) {
 		assertThatThrownBy(() -> userService.updateUser(user))
 				.isInstanceOf(NullPointerException.class);
 

@@ -77,6 +77,7 @@ public class ExchangeRatesParameters {
 
 
 
+
         return Stream.of(
                 Arguments.of(exchangeRates1),
                 Arguments.of(exchangeRates2),
@@ -84,12 +85,14 @@ public class ExchangeRatesParameters {
                 Arguments.of(exchangeRates4),
                 Arguments.of(exchangeRates5)
 
+
+
         );
     }
 
 
 
-    public static Stream<Arguments> generateUpdate(){
+    public static Stream<Arguments> generateUpdateExchangeRates(){
         ExchangeRates exchangeRates1= new ExchangeRates(
                 1,
                 "KursnaLista1",
