@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceUnitTests {
@@ -34,6 +34,7 @@ class UserServiceUnitTests {
 
 		User result= userService.updateUser(userOld);
 
+		verify(userRepository,times(1)).save(any());
 		assertThat(result.getPersonalId()).isEqualTo(userNew.getPersonalId());
 
 	}
@@ -46,14 +47,14 @@ class UserServiceUnitTests {
 
 		assertThatThrownBy(() -> userService.updateUser(userOld))
 				.isInstanceOf(EntityNotFoundException.class)
-				.hasMessageContaining("User not found!")
+				.hasMessageContaining("User not found!");
 
-				;
+		verify(userRepository,never()).save(any());
 
 	}
 	@ParameterizedTest
 	@NullSource
-	void updateUser_invalidUser_throwsNullPointerException(User user) {
+	void updateUser_nullUser_throwsNullPointerException(User user) {
 		assertThatThrownBy(() -> userService.updateUser(user))
 				.isInstanceOf(NullPointerException.class);
 

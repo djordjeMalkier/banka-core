@@ -92,13 +92,14 @@ public class BankServiceUnitTests {
 
         ExchangeRates result=bankService.updateExchangeRates(exchangeRatesOld);
 
+        verify(exchangeRatesRepository,times(1)).save(any());
         assertThat(result.getIdExchangeRates()).isEqualTo(exchangeRatesNew.getIdExchangeRates());
         assertThat(result.getName()).isEqualTo(exchangeRatesNew.getName());
     }
 
     @ParameterizedTest
     @NullSource
-    void updateExchangeRates_invalidExchangeRates_ThrowsNullPointerException(ExchangeRates exchangeRates) {
+    void updateExchangeRates_nullExchangeRates_ThrowsNullPointerException(ExchangeRates exchangeRates) {
         assertThatThrownBy(() -> bankService.updateExchangeRates(exchangeRates))
                 .isInstanceOf(NullPointerException.class);
 
@@ -121,7 +122,7 @@ public class BankServiceUnitTests {
 
     @ParameterizedTest
     @NullSource
-    void getAllUsersOfEmptyBank_invalidBank_throwsNullPointerException(Bank bank) {
+    void getAllUsersOfEmptyBank_nullBank_throwsNullPointerException(Bank bank) {
         assertThatThrownBy(() -> bankService.getAllUsers(bank))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("The bank is null.");
