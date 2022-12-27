@@ -62,12 +62,16 @@ class BankServiceTest {
         assertThatThrownBy(() -> bankService.createBank(bank))
                 .isInstanceOf(NameOfTheBankAlreadyExistException.class)
                 .hasMessageContaining("Name of the bank already exists.");
+
+        verify(bankRepository, never()).save(any());
     }
 
     @Test
     void createBank_nullBank_throwsNullPointerException() {
         assertThatThrownBy(() -> bankService.createBank(null))
                 .isInstanceOf(NullPointerException.class);
+
+        verify(bankRepository, never()).save(any());
     }
 
     @ParameterizedTest
@@ -122,6 +126,7 @@ class BankServiceTest {
     void updateBank_ok(Bank bankOld, Bank bankNew) throws NameOfTheBankAlreadyExistException {
         Mockito.when(bankRepository.findByIdBank(bankOld.getIdBank())).thenReturn(Optional.of(bankOld));
         Mockito.when(bankRepository.save(bankOld)).thenReturn(bankNew);
+
         //when
         Bank updateBank = bankService.updateBank(bankOld);
 
@@ -141,11 +146,13 @@ class BankServiceTest {
         assertThatThrownBy(() -> bankService.updateBank(bank))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("The bank does not exist.");
+
+        verify(bankRepository, never()).save(any());
     }
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void updateBank_sameName_ThrowsNameOfTheBankAlreadyExistException(Bank bank) {
+    void updateBank_sameName_throwsNameOfTheBankAlreadyExistException(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
 
@@ -153,6 +160,8 @@ class BankServiceTest {
         assertThatThrownBy(() -> bankService.updateBank(bank))
                 .isInstanceOf(NameOfTheBankAlreadyExistException.class)
                 .hasMessageContaining("Name already exist."); //ove poruke ne moraju da se stavljaju
+
+        verify(bankRepository, never()).save(any());
     }
 
     @ParameterizedTest
@@ -175,13 +184,15 @@ class BankServiceTest {
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bankObjectAndIdExchangeRates_param")
-    void addExchangeRates_invalidBankId_ThrowsNullPointerException(Bank bank, Integer idExchangeRates) {
+    void addExchangeRates_invalidBankId_throwsNullPointerException(Bank bank, Integer idExchangeRates) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
         assertThatThrownBy(() -> bankService.addExchangeRates(idExchangeRates, bank))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("The bank does not exist.");
+
+        verify(bankRepository, never()).save(any());
     }
 
     @ParameterizedTest
@@ -194,5 +205,7 @@ class BankServiceTest {
         assertThatThrownBy(() -> bankService.addExchangeRates(idExchangeRates, bank))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("The exchange rate does not exist.");
+
+        verify(bankRepository, never()).save(any());
     }
 }

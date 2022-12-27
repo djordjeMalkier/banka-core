@@ -1,6 +1,8 @@
 package common.bankarskiSistem.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +21,8 @@ import java.util.List;
 @Table(name = "bank")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class Bank {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
