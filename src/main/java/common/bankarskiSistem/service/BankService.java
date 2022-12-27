@@ -102,11 +102,11 @@ public class BankService {
      * @return exchange rates
      */
     @Transactional
-    public ExchangeRates updateExchangeRates(ExchangeRates exchangeRates, String name) {
+    public ExchangeRates updateExchangeRates(ExchangeRates exchangeRates) {
         if(exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates()).isEmpty())
             throw new NullPointerException("The exchanges rates do not exist.");
         ExchangeRates updatedExchangeRates = exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates()).get();
-        updatedExchangeRates.setName(name);
+        updatedExchangeRates.setName(exchangeRates.getName());
 
         return exchangeRatesRepository.save(updatedExchangeRates);
     }

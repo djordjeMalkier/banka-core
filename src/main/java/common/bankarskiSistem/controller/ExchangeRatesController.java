@@ -47,7 +47,7 @@ public class ExchangeRatesController {
         ExchangeRates exchangeRates;
         try{
              exchangeRates = bankService.findByIdExchangeRates(idExchangeRates);
-             bankService.updateExchangeRates(exchangeRates,updatedExchangeRates.getName());
+             bankService.updateExchangeRates(exchangeRates);
 
 
 
