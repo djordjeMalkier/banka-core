@@ -7,7 +7,6 @@ import common.bankarskiSistem.repository.ConversionRepository;
 import common.bankarskiSistem.repository.UserRepository;
 import common.bankarskiSistem.service.ConversionService;
 import common.bankarskiSistem.service.UserService;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,15 +27,8 @@ class UserServiceUnitTests {
 	private UserService userService;
 	@InjectMocks
 	private ConversionService conversionService;
-
 	@Mock
 	private UserRepository userRepository;
-
-	@Mock
-	private BankAccountRepository bankAccountRepository;
-
-	@Mock
-	private ConversionRepository conversionRepository;
 
 
 
@@ -235,6 +226,5 @@ class UserServiceUnitTests {
 
 		assertEquals(expectedMessage,actualMessage);
 	}
-
 
 }
