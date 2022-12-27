@@ -15,13 +15,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-
 public class BankService {
     @Autowired
     private BankRepository bankRepository;
     @Autowired
     private ExchangeRatesRepository exchangeRatesRepository;
-
 
     /**
      *
@@ -74,6 +72,9 @@ public class BankService {
         if(bankRepository.findByIdBank(bank.getIdBank()).isEmpty())
             throw new NullPointerException("The bank does not exist.");
         Bank updatedBank = bankRepository.findByIdBank(bank.getIdBank()).get();
+        if(exchangeRatesRepository.findByIdExchangeRates(idExchangeRates).isEmpty()) {
+            throw new NullPointerException("The exchange rate does not exist.");
+        }
         updatedBank.setExchangeRates(exchangeRatesRepository.findByIdExchangeRates(idExchangeRates).get());
         return bankRepository.save(updatedBank);
 
