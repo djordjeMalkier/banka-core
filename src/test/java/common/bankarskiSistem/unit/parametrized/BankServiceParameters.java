@@ -1,7 +1,9 @@
 package common.bankarskiSistem.unit.parametrized;
 
 import common.bankarskiSistem.model.Bank;
+import common.bankarskiSistem.model.BankAccount;
 import common.bankarskiSistem.model.ExchangeRates;
+import common.bankarskiSistem.model.User;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;

@@ -38,24 +38,24 @@ class BankServiceTest {
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
     void createBank_ok(Bank bank, Bank saved) throws NameOfTheBankAlreadyExistException {
         //when
-        when(bankRepository.save(any(Bank.class)))
-                .thenReturn(saved);
+        when(bankRepository.save(any(Bank.class))).thenReturn(saved);
 
         Bank actual = bankService.createBank(bank);
 
         //then
-      /*ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
+        /*ArgumentCaptor<Bank> bankArgumentCaptor = ArgumentCaptor.forClass(Bank.class);
         verify(bankRepository).save(bankArgumentCaptor.capture());
 
         Bank capturedBank = bankArgumentCaptor.getValue();*/
 
         verify(bankRepository, times(1)).findByName(anyString());
+        verify(bankRepository, times(1)).save(any()); //tacno jednom moze da se desi save
         assertThat(actual).isEqualTo(saved);
     }
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void createBank_ThrowsNameOfTheBankAlreadyExistException(Bank bank) {
+    void createBank_sameName_throwsNameOfTheBankAlreadyExistException(Bank bank) {
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
 
         //when and then
@@ -65,14 +65,14 @@ class BankServiceTest {
     }
 
     @Test
-    void createBank_ThrowsNullPointerException() {
+    void createBank_nullBank_throwsNullPointerException() {
         assertThatThrownBy(() -> bankService.createBank(null))
                 .isInstanceOf(NullPointerException.class);
     }
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void deleteBank_ok(Bank bank) {
+    void deleteBank_validId_ok(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         Mockito.when(bankRepository.deleteByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
 
@@ -80,12 +80,13 @@ class BankServiceTest {
         Bank result = bankService.deleteBank(bank);
 
         //then
+        verify(bankRepository, times(1)).deleteByIdBank(any());
         assertThat(result.getIdBank()).isEqualTo(bank.getIdBank());
     }
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void deleteBank_ThrowsNullPointerException(Bank bank) {
+    void deleteBank_invalidId_throwsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
@@ -95,7 +96,7 @@ class BankServiceTest {
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void findById_ok(Bank bank) {
+    void findById_validId_ok(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
 
         //when
@@ -107,7 +108,7 @@ class BankServiceTest {
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void findById_ThrowsNullPointerException(Bank bank) {
+    void findById_invalidId_throwsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
@@ -126,27 +127,14 @@ class BankServiceTest {
 
         //then
         verify(bankRepository, times(1)).findByName(anyString());
-
+        verify(bankRepository, times(1)).save(any());
         assertThat(updateBank.getAddress()).isEqualTo(bankNew.getAddress());
         assertThat(updateBank.getName()).isEqualTo(bankNew.getName());
     }
 
-    /*@ParameterizedTest
-    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#updateBank_params")
-    void updateBankAddress_ok(Bank bankOld, Bank bankNew) throws NameOfTheBankAlreadyExistException {
-        Mockito.when(bankRepository.findByIdBank(bankOld.getIdBank())).thenReturn(Optional.of(bankOld));
-        Mockito.when(bankRepository.save(bankOld)).thenReturn(bankNew);
-        //when
-        Bank updateBank = bankService.updateBank(bankOld);
-
-        //then
-        verify(bankRepository, times(1)).findByName(anyString());
-        assertThat(updateBank.getAddress()).isEqualTo(bankNew.getAddress());
-    }*/
-
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void updateBank_ThrowsNullPointerException(Bank bank) {
+    void updateBank_invalidId_throwsNullPointerException(Bank bank) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
@@ -157,7 +145,7 @@ class BankServiceTest {
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bank_params")
-    void updateBank_ThrowsNameOfTheBankAlreadyExistException(Bank bank) {
+    void updateBank_sameName_ThrowsNameOfTheBankAlreadyExistException(Bank bank) {
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
 
@@ -187,12 +175,24 @@ class BankServiceTest {
 
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bankObjectAndIdExchangeRates_param")
-    void addExchangeRates_ThrowsNullPointerException(Bank bank, Integer idExchangeRates) {
+    void addExchangeRates_invalidBankId_ThrowsNullPointerException(Bank bank, Integer idExchangeRates) {
         given(bankRepository.findByIdBank(bank.getIdBank())).willReturn(Optional.empty());
 
         //when and then
         assertThatThrownBy(() -> bankService.addExchangeRates(idExchangeRates, bank))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("The bank does not exist.");
+    }
+
+    @ParameterizedTest
+    @MethodSource("common.bankarskiSistem.unit.parametrized.BankServiceParameters#bankObjectAndIdExchangeRates_param")
+    void addExchangeRates_invalidExchangeRateId_ThrowsNullPointerException(Bank bank, Integer idExchangeRates) {
+        Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
+        given(exchangeRatesRepository.findByIdExchangeRates(idExchangeRates)).willReturn(Optional.empty());
+
+        //when and then
+        assertThatThrownBy(() -> bankService.addExchangeRates(idExchangeRates, bank))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("The exchange rate does not exist.");
     }
 }
