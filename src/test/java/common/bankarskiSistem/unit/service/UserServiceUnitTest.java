@@ -10,8 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
+
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -95,15 +97,14 @@ class UserServiceUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource({"common.bankarskiSistem.parametrized.Parameters#generateBankAccount"})
-    public void payIn_whenPayInBankAccount_thenReturnBankBalance(User user, BankAccount bankAccount) throws EntityNotFoundException {
-        double payment = 500;
-        double oldBalance = 5000;
-        bankAccount.setBalance(oldBalance);
-        when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
-        double newBalance = userService.payIn(user.getPersonalId(), bankAccount.getIdAccount(), payment);
+    @MethodSource({"common.bankarskiSistem.parametrized.Parameters#generateBankAccountForPayIn"})
+    public void payIn_whenPayInBankAccount_thenReturnBankBalance(User user, BankAccount bankAccount, double payment,
+                                                                 double newBalance) throws EntityNotFoundException {
 
-        assertEquals(newBalance, oldBalance + payment);
+        when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
+        double balance = userService.payIn(user.getPersonalId(), bankAccount.getIdAccount(), payment);
+
+        assertEquals(balance, newBalance);
     }
 
     @ParameterizedTest
@@ -120,21 +121,21 @@ class UserServiceUnitTest {
     public void payIn_whenPaymentLessThenOrEqualsZero_thenThrowsIllegalArgumentException(User user, BankAccount bankAccount) {
         double payment = 0;
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
-            userService.payIn(user.getPersonalId(), bankAccount.getIdAccount(), payment));
+                userService.payIn(user.getPersonalId(), bankAccount.getIdAccount(), payment));
 
         assertEquals(exception.getMessage(), "Payment must be positive");
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.parametrized.Parameters#generateBankAccount")
-    public void payOut_whenPayOutBankAccount_thenReturnBankBalance(User user, BankAccount bankAccount) throws EntityNotFoundException {
-        double payment = 50;
-        double oldBalance = 5000;
-        bankAccount.setBalance(oldBalance);
+    @MethodSource("common.bankarskiSistem.parametrized.Parameters#generateBankAccountForPayOut")
+    public void payOut_whenPayOutBankAccount_thenReturnBankBalance(User user, BankAccount bankAccount, double payment,
+                                                                   double newBalance) throws EntityNotFoundException {
+
         when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
 
-        double newBalance = userService.payOut(user.getPersonalId(), bankAccount.getIdAccount(), payment);
-        assertEquals(newBalance, oldBalance - payment);
+        double balance = userService.payOut(user.getPersonalId(), bankAccount.getIdAccount(), payment);
+
+        assertEquals(balance, newBalance);
     }
 
     @ParameterizedTest
@@ -151,16 +152,16 @@ class UserServiceUnitTest {
     public void payOut_whenPaymentLessThenOrEqualsZero_thenThrowsIllegalArgumentException(User user, BankAccount bankAccount) {
         double payment = 0;
         Exception exception = assertThrows(IllegalArgumentException.class, () ->
-            userService.payOut(user.getPersonalId(), bankAccount.getIdAccount(), payment));
+                userService.payOut(user.getPersonalId(), bankAccount.getIdAccount(), payment));
 
         assertEquals(exception.getMessage(), "Payout must be positive");
     }
 
     @ParameterizedTest
-    @MethodSource("common.bankarskiSistem.parametrized.Parameters#generateBankAccount")
-    public void payOut_whenPaymentGraterThenBalance_thenThrowsArithmeticException(User user, BankAccount bankAccount) {
-        double payment = 1000;
-        bankAccount.setBalance(500);
+    @MethodSource("common.bankarskiSistem.parametrized.Parameters#generatePayOutWhenPaymentGraterThenBalance")
+    public void payOut_whenPaymentGraterThenBalance_thenThrowsArithmeticException(User user, BankAccount bankAccount,
+                                                                                  double payment) {
+
         when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
         Exception exception = assertThrows(ArithmeticException.class, () ->
                 userService.payOut(user.getPersonalId(), bankAccount.getIdAccount(), payment));
@@ -181,7 +182,7 @@ class UserServiceUnitTest {
     @Test
     public void createBankAccount_whenBankAccountIsNull_thenThrowsNullPointerException() {
         Exception exception = assertThrows(NullPointerException.class, () ->
-            userService.createBankAccount(null));
+                userService.createBankAccount(null));
         assertEquals("Null bank account", exception.getMessage());
     }
 
