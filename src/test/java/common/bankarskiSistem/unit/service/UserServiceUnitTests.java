@@ -2,15 +2,12 @@ package common.bankarskiSistem.unit.service;
 
 import common.bankarskiSistem.exceptions.EntityNotFoundException;
 import common.bankarskiSistem.model.*;
-import common.bankarskiSistem.repository.BankAccountRepository;
-import common.bankarskiSistem.repository.ConversionRepository;
 import common.bankarskiSistem.repository.UserRepository;
 import common.bankarskiSistem.service.ConversionService;
 import common.bankarskiSistem.service.UserService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,8 +27,6 @@ class UserServiceUnitTests {
 	private ConversionService conversionService;
 	@Mock
 	private UserRepository userRepository;
-
-
 
 
 	@ParameterizedTest
