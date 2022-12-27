@@ -1,7 +1,9 @@
 package common.bankarskiSistem.unit.service;
 
 import common.bankarskiSistem.exceptions.EntityNotFoundException;
-import common.bankarskiSistem.model.*;
+import common.bankarskiSistem.model.BankAccount;
+import common.bankarskiSistem.model.Currency;
+import common.bankarskiSistem.model.User;
 import common.bankarskiSistem.repository.UserRepository;
 import common.bankarskiSistem.service.ConversionService;
 import common.bankarskiSistem.service.UserService;
@@ -9,21 +11,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceUnitTests {
@@ -33,7 +33,6 @@ class UserServiceUnitTests {
 	private ConversionService conversionService;
 	@Mock
 	private UserRepository userRepository;
-
 
 	@ParameterizedTest
 	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
@@ -216,20 +215,15 @@ class UserServiceUnitTests {
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
 
-		Exception exception = assertThrows(NullPointerException.class, () ->{
-			userService.getBalance(user.getPersonalId(),bankAccount.getIdAccount()
-					,null);
+		Exception exception = assertThrows(NullPointerException.class, () -> {
+			userService.getBalance(user.getPersonalId(), bankAccount.getIdAccount()
+					, null);
 		});
 
 		String expectedMessage = "Cannot invoke \"java.util.Optional.isPresent()\" because \"currencyTo\" is null";
 		String actualMessage = exception.getMessage();
+	}
 
-	@Mock
-	private UserRepository userRepository;
-
-
-	@InjectMocks
-	private UserService userService;
 
 	@ParameterizedTest
 	@MethodSource({"common.bankarskiSistem.unit.service.parametrized.UserParameters#generateUpdateUser"})
