@@ -19,6 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ExchangeRates {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

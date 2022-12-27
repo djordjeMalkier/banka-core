@@ -1,9 +1,8 @@
 package common.bankarskiSistem.parametrized;
 
 import common.bankarskiSistem.model.Bank;
-import common.bankarskiSistem.model.BankAccount;
 import common.bankarskiSistem.model.ExchangeRates;
-import common.bankarskiSistem.model.User;
+
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
@@ -12,11 +11,17 @@ public final class BankServiceParameters {
     public static Stream<Arguments> bank_params() {
         String name = "Intesa";
         String address = "Vojvode Vlahovica 1";
-        Bank bank = new Bank();
-        bank.setName(name);
-        bank.setAddress(address);
 
-        Bank saved = new Bank(1, name, address);
+        Bank bank = Bank.builder()
+                .name(name)
+                .address(address)
+                .build();
+
+        Bank saved = Bank.builder()
+                .idBank(1)
+                .name(name)
+                .address(address)
+                .build();
 
         return Stream.of(Arguments.of(bank, saved));
     }
@@ -31,26 +36,25 @@ public final class BankServiceParameters {
     public static Stream<Arguments> updateBank_params() {
         Integer idBank = 1;
 
-        Bank bankOld;
+
         String nameOld = "Erste";
         String addressOld = "Vojvode Vlahovica 1";
 
-        Bank bankNew;
         String nameNew = "Intesa";
         String addressNew = "Stepe Stepanovica 1";
 
         return Stream.of(
                 Arguments.of(
-                    bankOld = new Bank(idBank, nameOld, addressOld),
-                    bankNew = new Bank(idBank, nameNew, addressOld)
+                    new Bank(idBank, nameOld, addressOld),
+                    new Bank(idBank, nameNew, addressOld)
                 ),
                 Arguments.of(
-                    bankOld = new Bank(idBank, nameOld, addressOld),
-                    bankNew = new Bank(idBank, nameOld, addressNew)
+                    new Bank(idBank, nameOld, addressOld),
+                    new Bank(idBank, nameOld, addressNew)
                 ),
                 Arguments.of(
-                    bankOld = new Bank(idBank, nameOld, addressOld),
-                    bankNew = new Bank(idBank, nameNew, addressNew)
+                    new Bank(idBank, nameOld, addressOld),
+                    new Bank(idBank, nameNew, addressNew)
                 )
         );
     }
@@ -58,17 +62,21 @@ public final class BankServiceParameters {
     public static Stream<Arguments> exchangeRates_params() {
         Integer idExchangeRates = 1;
         String nameExchangeRates = "Kurs 1";
-        ExchangeRates exchangeRates = new ExchangeRates();
-        exchangeRates.setIdExchangeRates(idExchangeRates);
-        exchangeRates.setName(nameExchangeRates);
+
+        ExchangeRates exchangeRates = ExchangeRates.builder()
+                .idExchangeRates(idExchangeRates)
+                .name(nameExchangeRates)
+                .build();
 
         Integer idBank = 1;
         String nameBank = "Intesa";
         String address = "Vojvode Vlahovica 1";
-        Bank bank = new Bank();
-        bank.setIdBank(idBank);
-        bank.setName(nameBank);
-        bank.setAddress(address);
+
+        Bank bank = Bank.builder()
+                .idBank(idBank)
+                .name(nameBank)
+                .address(address)
+                .build();
 
         return Stream.of(Arguments.of(bank, exchangeRates));
     }
