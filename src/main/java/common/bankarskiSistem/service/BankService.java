@@ -87,7 +87,7 @@ public class BankService {
     @Transactional
     public ExchangeRates createExchangeRates(ExchangeRates exchangeRates) {
         if(exchangeRates == null)
-            throw new NullPointerException("The bank is null.");
+            throw new NullPointerException("The exchangeRates is null");
         return exchangeRatesRepository.save(exchangeRates);
     }
 
@@ -103,11 +103,11 @@ public class BankService {
      * @return exchange rates
      */
     @Transactional
-    public ExchangeRates updateExchangeRates(ExchangeRates exchangeRates, String name) {
+    public ExchangeRates updateExchangeRates(ExchangeRates exchangeRates) {
         if(exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates()).isEmpty())
             throw new NullPointerException("The exchanges rates do not exist.");
         ExchangeRates updatedExchangeRates = exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates()).get();
-        updatedExchangeRates.setName(name);
+        updatedExchangeRates.setName(exchangeRates.getName());
 
         return exchangeRatesRepository.save(updatedExchangeRates);
     }
