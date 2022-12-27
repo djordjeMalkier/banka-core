@@ -91,8 +91,8 @@ class UserServiceUnitTests {
 
 	@ParameterizedTest
 	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
-	@ValueSource(ints = {1,2})
-	public void getBankAccountByID_nonValidBankAccountId_nullReturned(User user, Integer nonValidBankAccountId) {
+	public void getBankAccountByID_nonValidBankAccountId_nullReturned(User user) {
+		int nonValidBankAccountId = 1;
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
 
