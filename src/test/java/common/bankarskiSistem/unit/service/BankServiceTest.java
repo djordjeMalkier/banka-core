@@ -153,6 +153,7 @@ class BankServiceTest {
     @ParameterizedTest
     @MethodSource("common.bankarskiSistem.parametrized.BankServiceParameters#bank_params")
     void updateBank_sameName_throwsNameOfTheBankAlreadyExistException(Bank bank) {
+
         Mockito.when(bankRepository.findByIdBank(bank.getIdBank())).thenReturn(Optional.of(bank));
         given(bankRepository.findByName(bank.getName())).willReturn(Optional.of(bank));
 

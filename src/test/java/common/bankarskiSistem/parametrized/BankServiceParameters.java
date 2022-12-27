@@ -2,6 +2,7 @@ package common.bankarskiSistem.parametrized;
 
 import common.bankarskiSistem.model.Bank;
 import common.bankarskiSistem.model.ExchangeRates;
+
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
@@ -10,6 +11,7 @@ public final class BankServiceParameters {
     public static Stream<Arguments> bank_params() {
         String name = "Intesa";
         String address = "Vojvode Vlahovica 1";
+
         Bank bank = Bank.builder()
                 .name(name)
                 .address(address)
@@ -33,6 +35,7 @@ public final class BankServiceParameters {
 
     public static Stream<Arguments> updateBank_params() {
         Integer idBank = 1;
+
 
         String nameOld = "Erste";
         String addressOld = "Vojvode Vlahovica 1";
@@ -59,6 +62,7 @@ public final class BankServiceParameters {
     public static Stream<Arguments> exchangeRates_params() {
         Integer idExchangeRates = 1;
         String nameExchangeRates = "Kurs 1";
+
         ExchangeRates exchangeRates = ExchangeRates.builder()
                 .idExchangeRates(idExchangeRates)
                 .name(nameExchangeRates)
@@ -67,6 +71,7 @@ public final class BankServiceParameters {
         Integer idBank = 1;
         String nameBank = "Intesa";
         String address = "Vojvode Vlahovica 1";
+
         Bank bank = Bank.builder()
                 .idBank(idBank)
                 .name(nameBank)

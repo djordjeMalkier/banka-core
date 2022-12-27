@@ -16,6 +16,7 @@ import java.util.List;
 @Table(name = "exchangeRates")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
