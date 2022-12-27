@@ -13,43 +13,48 @@ import java.util.stream.Stream;
 public class ConversionServiceParameters {
 
     public static Stream<Arguments> generateConversion(){
-        Conversion conversion1 = new Conversion(
-                1,
-                Currency.EUR,
-                Currency.RSD,
-                117.1,
-                null);
+        Conversion conversion1 = Conversion.builder()
+                .idConversion(1)
+                .currencyFrom(Currency.EUR)
+                .currencyTo(Currency.RSD)
+                .value(117.1)
+                .exchangeRates(null)
+                .build();
 
-        Conversion conversion2 = new Conversion(
-                1,
-                Currency.RSD,
-                Currency.EUR,
-                0.75,
-                null);
+        Conversion conversion2 = Conversion.builder()
+                .idConversion(1)
+                .currencyFrom(Currency.RSD)
+                .currencyTo(Currency.EUR)
+                .value(0.75)
+                .exchangeRates(null)
+                .build();
 
         return Stream.of(Arguments.of(conversion1, conversion2));
     }
 
     public static Stream<Arguments> generateBank(){
-         Conversion conversion = new Conversion(
-                5,
-                Currency.EUR,
-                Currency.RSD,
-                0.75,
-                null);
+         Conversion conversion = Conversion.builder()
+                 .idConversion(5)
+                 .currencyFrom(Currency.RSD)
+                 .currencyTo(Currency.EUR)
+                 .value(0.75)
+                 .exchangeRates(null)
+                 .build();
 
-        ExchangeRates exchangeRates = new ExchangeRates(
-                1,
-                "kurs 1",
-                new ArrayList<>(List.of(conversion)),
-                null);
+        ExchangeRates exchangeRates = ExchangeRates.builder()
+                .idExchangeRates(1)
+                .name("kurs 1")
+                .conversions(new ArrayList<>(List.of(conversion)))
+                .banks(null)
+                .build();
 
-        Bank bank = new Bank(
-                1,
-                "Bank Intesa",
-                "Milutina Milankovica 1",
-                null,
-                exchangeRates);
+        Bank bank = Bank.builder()
+                .idBank(1)
+                .name("Bank Intesa")
+                .address("Milutina Milankovica 1")
+                .bankAccounts(null)
+                .exchangeRates(exchangeRates)
+                .build();
 
         return Stream.of(
                 Arguments.of(bank, conversion)
