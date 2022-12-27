@@ -69,8 +69,9 @@ public class ConversionService {
     }
 
     public Conversion findByIdConversion(Integer idConversion) {
-        if(conversionRepository.findByIdConversion(idConversion).isEmpty())
+        Optional<Conversion> conversion = conversionRepository.findByIdConversion(idConversion);
+        if(conversion.isEmpty())
             throw new NullPointerException("The conversion dose not exist.");
-        return conversionRepository.findByIdConversion(idConversion).get();
+        return conversion.get();
     }
 }

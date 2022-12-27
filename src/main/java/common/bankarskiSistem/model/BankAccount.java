@@ -49,7 +49,7 @@ public class BankAccount {
     }
 
     public BankAccount(AccountType accountType, Currency currency, Bank bank, int idAccount) {
-        if(accountType == null || currency == null || user == null || bank == null) {
+        if(accountType == null || currency == null || bank == null) {
             throw new NullPointerException("Null value while creating account");
         }
         this.accountType = accountType;
