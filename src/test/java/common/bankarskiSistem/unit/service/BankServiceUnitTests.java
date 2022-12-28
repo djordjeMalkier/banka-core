@@ -1,5 +1,6 @@
 package common.bankarskiSistem.unit.service;
 
+import common.bankarskiSistem.exceptions.EntityNotFoundException;
 import common.bankarskiSistem.exceptions.NameOfTheBankAlreadyExistException;
 import common.bankarskiSistem.model.*;
 import common.bankarskiSistem.repository.BankRepository;
@@ -264,10 +265,15 @@ public class BankServiceUnitTests {
     }
 
     @ParameterizedTest
-    @NullSource
+    @MethodSource({"common.bankarskiSistem.parametrized.ExchangeRatesParameters#generateUpdateExchangeRatesWithEmpty"})
     void updateExchangeRates_nullExchangeRates_ThrowsNullPointerException(ExchangeRates exchangeRates) {
+        when(exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates())).thenReturn(Optional.empty());
+
         assertThatThrownBy(() -> bankService.updateExchangeRates(exchangeRates))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("The exchanges rates do not exist.");
+
+        verify(exchangeRatesRepository,never()).save(any());
     }
 
     @ParameterizedTest

@@ -108,6 +108,14 @@ public class ExchangeRatesParameters {
         return Stream.of(Arguments.of(exchangeRates1, exchangeRates2));
     }
 
+    public static Stream<Arguments> generateUpdateExchangeRatesWithEmpty(){
+        ExchangeRates exchangeRates1= new ExchangeRates();
+
+
+
+        return Stream.of(Arguments.of(exchangeRates1));
+    }
+
 
 
     public static Stream<Arguments> generateBank() {
