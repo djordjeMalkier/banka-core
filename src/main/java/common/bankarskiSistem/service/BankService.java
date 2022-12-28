@@ -15,13 +15,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-
 public class BankService {
     @Autowired
     private BankRepository bankRepository;
     @Autowired
     private ExchangeRatesRepository exchangeRatesRepository;
-
 
     /**
      *
@@ -74,6 +72,9 @@ public class BankService {
         if(bankRepository.findByIdBank(bank.getIdBank()).isEmpty())
             throw new NullPointerException("The bank does not exist.");
         Bank updatedBank = bankRepository.findByIdBank(bank.getIdBank()).get();
+        if(exchangeRatesRepository.findByIdExchangeRates(idExchangeRates).isEmpty()) {
+            throw new NullPointerException("The exchange rate does not exist.");
+        }
         updatedBank.setExchangeRates(exchangeRatesRepository.findByIdExchangeRates(idExchangeRates).get());
         return bankRepository.save(updatedBank);
 
@@ -86,7 +87,7 @@ public class BankService {
     @Transactional
     public ExchangeRates createExchangeRates(ExchangeRates exchangeRates) {
         if(exchangeRates == null)
-            throw new NullPointerException("The bank is null.");
+            throw new NullPointerException("The exchangeRates is null");
         return exchangeRatesRepository.save(exchangeRates);
     }
 
@@ -102,11 +103,11 @@ public class BankService {
      * @return exchange rates
      */
     @Transactional
-    public ExchangeRates updateExchangeRates(ExchangeRates exchangeRates, String name) {
+    public ExchangeRates updateExchangeRates(ExchangeRates exchangeRates) {
         if(exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates()).isEmpty())
             throw new NullPointerException("The exchanges rates do not exist.");
         ExchangeRates updatedExchangeRates = exchangeRatesRepository.findByIdExchangeRates(exchangeRates.getIdExchangeRates()).get();
-        updatedExchangeRates.setName(name);
+        updatedExchangeRates.setName(exchangeRates.getName());
 
         return exchangeRatesRepository.save(updatedExchangeRates);
     }

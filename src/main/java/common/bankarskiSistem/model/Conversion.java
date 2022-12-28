@@ -1,17 +1,16 @@
 package common.bankarskiSistem.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import javax.persistence.*;
 
 @Entity
 @Table(name = "conversion")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Conversion {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
