@@ -16,8 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,9 +27,6 @@ public class UserService implements UserDetailsService {
     private static final Logger log = LoggerFactory.getLogger(BankarskiSistem.class);
     private final UserRepository userRepository;
     private final ConversionService conversionService;
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     // UPDATE user
     @Transactional
@@ -69,6 +64,7 @@ public class UserService implements UserDetailsService {
         if(id == null)
             throw new NullPointerException("Null personal id");
         Optional<User> userOptional = userRepository.findByPersonalId(id);
+
         if (userOptional.isEmpty())
             throw new EntityNotFoundException("User not found!");
         userRepository.deleteByPersonalId(id);
@@ -81,18 +77,16 @@ public class UserService implements UserDetailsService {
         if(bankAccount == null)
             throw new NullPointerException("Null bank account");
         User existingUser = getUserByPersonalID(bankAccount.getUser().getPersonalId());
-        if (existingUser == null)
-            throw new EntityAlreadyExistsException("This bank account already exists!");
 
-        BankAccount bankAccountMerged = entityManager.merge(bankAccount);
-        existingUser.addAccount(bankAccountMerged);
+        existingUser.addAccount(bankAccount);
         userRepository.save(existingUser);
-        return bankAccountMerged;
+        return bankAccount;
     }
 
     @Transactional
     public double payIn(String personalId, Integer idAccount, double payment) throws EntityNotFoundException {
-        if (idAccount == null) throw new NullPointerException("No account");
+        if (idAccount == null)
+            throw new NullPointerException("No account");
 
         if (payment <= 0)
             throw new IllegalArgumentException("Payment must be positive");
