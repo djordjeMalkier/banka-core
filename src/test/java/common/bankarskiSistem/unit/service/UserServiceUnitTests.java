@@ -36,7 +36,7 @@ class UserServiceUnitTests {
 
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateUser")
 	public void getUserByPersonalID_found(User user) {
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
@@ -47,7 +47,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateUser")
 	public void getUserByPersonalID_nullPersonalId_NullPointerExceptionIsThrown(User user) {
 
 		Exception exception = assertThrows(NullPointerException.class, () ->{
@@ -61,7 +61,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateUser")
 	public void getUserByPersonalID_nonExistingUser_userNotFound(User user) {
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.empty());
@@ -78,7 +78,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccount")
 	public void getBankAccountByID_found(User user, BankAccount bankAccount) {
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
@@ -91,7 +91,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateUser")
 	public void getBankAccountByID_nonValidBankAccountId_nullReturned(User user) {
 		int nonValidBankAccountId = 1;
 
@@ -103,7 +103,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccount")
 	public void deleteBankAccountById_deleted(User user, BankAccount bankAccount) throws EntityNotFoundException {
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
@@ -117,7 +117,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateUser")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateUser")
 	public void deleteBankAccountById_nonValidAccountId_NullPointerExceptionIsThrown(User user) {
 
 		Exception exception = assertThrows(NullPointerException.class, () ->{
@@ -131,7 +131,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccount")
 	public void deleteBankAccountById_nonValidPersonalId_NullPointerExceptionIsThrown(User user, BankAccount bankAccount) {
 
 		Exception exception = assertThrows(NullPointerException.class, () ->{
@@ -145,7 +145,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccountWithoutUser")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccountWithoutUser")
 	public void deleteBankAccountById_nonValidPersonalId_EntityExceptionIsThrown(User user, BankAccount bankAccount) {
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
 
@@ -160,7 +160,7 @@ class UserServiceUnitTests {
 	}
 
 /*	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccount")
 	public void getBalance_okWithToCurrency(User user, BankAccount bankAccount) throws EntityNotFoundException {
 		Currency currency = Currency.RSD;
 		Conversion conversion = new Conversion(
@@ -182,7 +182,7 @@ class UserServiceUnitTests {
 	}*/
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccount")
 	public void getBalance_nullPersonalID_NullPointerException(User user, BankAccount bankAccount) {
 		Currency currency = Currency.EUR;
 
@@ -197,7 +197,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccount")
 	public void getBalance_nullAccountId_NullPointerException(User user, BankAccount bankAccount) {
 
 		Exception exception = assertThrows(NullPointerException.class, () ->{
@@ -211,7 +211,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource("common.bankarskiSistem.parametrised.UserServiceParameters#generateBankAccount")
+	@MethodSource("common.bankarskiSistem.parametrized.UserServiceParameters#generateBankAccount")
 	public void getBalance_nullCurrency_NullPointerException(User user, BankAccount bankAccount) {
 
 		Mockito.when(userRepository.findByPersonalId(user.getPersonalId())).thenReturn(Optional.of(user));
