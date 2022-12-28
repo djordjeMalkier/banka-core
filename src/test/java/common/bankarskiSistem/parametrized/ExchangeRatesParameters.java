@@ -1,4 +1,4 @@
-package common.bankarskiSistem.unit.service.parametrized;
+package common.bankarskiSistem.parametrized;
 
 import common.bankarskiSistem.model.*;
 import org.junit.jupiter.params.provider.Arguments;

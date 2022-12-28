@@ -20,7 +20,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -228,7 +227,7 @@ class UserServiceUnitTests {
 
 
 	@ParameterizedTest
-	@MethodSource({"common.bankarskiSistem.unit.service.parametrized.UserParameters#generateUpdateUser"})
+	@MethodSource({"common.bankarskiSistem.parametrized.UserParameters#generateUpdateUser"})
 	void updateUser_ok(User userOld, User userNew) throws EntityNotFoundException {
 		when(userRepository.getReferenceById(userOld.getPersonalId())).thenReturn(userOld);
 		when(userRepository.save(any(User.class))).thenReturn(userNew);
@@ -241,7 +240,7 @@ class UserServiceUnitTests {
 	}
 
 	@ParameterizedTest
-	@MethodSource({"common.bankarskiSistem.unit.service.parametrized.UserParameters#generateUpdateUserWithNoPersonalId"})
+	@MethodSource({"common.bankarskiSistem.parametrized.UserParameters#generateUpdateUserWithNoPersonalId"})
 	void updateUser_userNotExists_throwsEntityNotFoundException(User userOld) {
 
 		when(userRepository.getReferenceById(userOld.getPersonalId())).thenReturn(userOld);
@@ -415,6 +414,4 @@ class UserServiceUnitTests {
                 userService.createBankAccount(null));
         assertEquals("Null bank account", exception.getMessage());
     }
-	}
-
 }

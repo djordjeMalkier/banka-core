@@ -35,7 +35,7 @@ public class BankServiceUnitTests {
 
 
     @ParameterizedTest
-    @MethodSource({"common.bankarskiSistem.unit.service.parametrized.ExchangeRatesParameters#generateExchangeRates"})
+    @MethodSource({"common.bankarskiSistem.parametrized.ExchangeRatesParameters#generateExchangeRates"})
     void addExchangeRates_ok(ExchangeRates exchangeRates) {
 
         bankService.createExchangeRates(exchangeRates);
@@ -84,7 +84,7 @@ public class BankServiceUnitTests {
 
 
     @ParameterizedTest
-    @MethodSource({"common.bankarskiSistem.unit.service.parametrized.ExchangeRatesParameters#generateUpdateExchangeRates"})
+    @MethodSource({"common.bankarskiSistem.parametrized.ExchangeRatesParameters#generateUpdateExchangeRates"})
     void updateExchangeRates_ok(ExchangeRates exchangeRatesOld, ExchangeRates exchangeRatesNew){
 
         when(exchangeRatesRepository.findByIdExchangeRates(exchangeRatesOld.getIdExchangeRates())).thenReturn(Optional.of(exchangeRatesOld));
@@ -107,7 +107,7 @@ public class BankServiceUnitTests {
 
 
     @ParameterizedTest
-    @MethodSource({"common.bankarskiSistem.unit.service.parametrized.ExchangeRatesParameters#generateBank"})
+    @MethodSource({"common.bankarskiSistem.parametrized.ExchangeRatesParameters#generateBank"})
     void getAllUsers_ok(Bank bank){
         Set<User> users=bankService.getAllUsers(bank);
 
