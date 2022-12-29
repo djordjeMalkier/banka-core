@@ -60,16 +60,17 @@ public class BankController {
     }
 
    @DeleteMapping("/delete")
-    public String deleteBank(@RequestParam Integer idBank) {
-        Bank bank;
+    public ResponseEntity<BankDto> deleteBank(@RequestParam Integer idBank) {
+        Bank bank = null;
         try {
             bank = bankService.findById(idBank);
             bankService.deleteBank(bank);
         } catch (NullPointerException exception) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
         }
-        return "The bank is deleted successfully.";
-    }
+       return ok(mapper.convertToDTOShowER(bank));
+
+   }
 
     @GetMapping("/get")
     public ResponseEntity<BankDto> getBankById(@RequestParam Integer idBank) {
